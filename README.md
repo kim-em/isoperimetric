@@ -1,7 +1,8 @@
 # Planar isoperimetric theorem in Lean 4
 
-**In development: the full geometric inequality is proved; equality rigidity is
-not yet proved.** The complete requested scope is retained in [GOAL.txt](GOAL.txt).
+**In development: the full geometric inequality and the circle converse are
+proved. General equality rigidity still needs the Jordan winding orientation
+bridge.** The complete requested scope is retained in [GOAL.txt](GOAL.txt).
 
 For `γ : ℝ → EuclideanSpace ℝ (Fin 2)`, the current public theorem is
 `Isoperimetric.RectifiableJordan.isoperimetric`:
@@ -71,10 +72,24 @@ The target equality characterization, recorded as the unproved proposition
   derivatives agree with projections of the vector derivative almost everywhere,
   then assembles scalar Wirtinger into the sharp planar estimate for the
   arclength loop.
-- The remaining work is the actual-area bridge for an arbitrary oriented Jordan
-  loop, the completion-of-squares argument and almost-everywhere circular ODE
-  rigidity, and the positive-radius circle converse. The final combined theorem
-  and catalogue entry must wait for those proofs.
+- [Analysis/Area.lean](Isoperimetric/Analysis/Area.lean) identifies the signed area
+  with the centered vector determinant integral. The rotation and
+  [completion-of-squares](Isoperimetric/Analysis/CompletionSquare.lean) modules
+  prove that signed-area equality forces the rotational ODE almost everywhere.
+  [RotationalODE.lean](Isoperimetric/Analysis/RotationalODE.lean) solves it using
+  absolute continuity and an integrating factor; [CircularImage.lean](Isoperimetric/Analysis/CircularImage.lean)
+  proves that its image is exactly a circle of positive radius, handling both signs.
+- [CircleInterior.lean](Isoperimetric/CircleInterior.lean) proves that the genuine
+  interior of a positive-radius circle is its open disk. [Circle.lean](Isoperimetric/Circle.lean)
+  proves its geometric length is `2 * π * r`, and transfers the circle equality
+  to every permitted parametrization with that image.
+- [GeometricArea.lean](Isoperimetric/GeometricArea.lean) reuses MovingSofa's
+  Lebesgue-area bridge and treats clockwise orientation by reversing the BV path.
+  It proves geometric equality rigidity once a genuine winding orientation is
+  supplied. **That extra input has not yet been derived from the four advertised
+  curve hypotheses.** The remaining mathematical bridge is that every such loop
+  winds uniformly `1` or uniformly `-1` around its bounded Jordan component.
+  The final unrestricted equality theorem and catalogue entry await that proof.
 
 ## Reproducible build
 
@@ -122,6 +137,10 @@ to absolute continuity. The upstream sharp Wirtinger and symplectic loop bound
 still require derivatives everywhere. MovingSofa already
 declares a vendored `TauCeti` library, so a second overlapping Lake dependency is
 not added.
+The newer TauCeti revision `aa1f50f094b85057c11f0bb07177ff27a32dbd7f` was also
+checked for the remaining winding bridge. Its straight-segment winding jump
+theorem still requires a piecewise `C¹` curve; it does not directly supply the
+unit-winding result for an arbitrary Lipschitz Jordan loop.
 
 ## Comparison with the HOL Light theorem
 

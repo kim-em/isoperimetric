@@ -16,7 +16,8 @@ run_cmd do
     `MovingSofa.IsJordanCurve.frontier_jordanInterior,
     `MovingSofa.intervalStieltjes_absoluteContinuity,
     `MovingSofa.intervalStieltjesIntegral_eq_integral_mul_of_density,
-    `MovingSofa.curveAreaFunctional_eq_of_comp_monotone_surjective]
+    `MovingSofa.curveAreaFunctional_eq_of_comp_monotone_surjective,
+    `MovingSofa.curveArea_eq_jordanInterior_area]
   let mut checked : Nat := 0
   for (name, info) in env.constants.toList do
     if (name.getRoot == `Isoperimetric && info.isTheorem) || bridges.contains name then
