@@ -1,0 +1,21 @@
+name: Lean
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install pinned Elan
+        run: |
+          curl -fsSL https://github.com/leanprover/elan/releases/download/v4.1.2/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./elan-init -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Prepare pinned dependencies
+        run: bash scripts/prepare-dependencies.sh
+      - name: Compile and audit axioms
+        run: bash scripts/check.sh

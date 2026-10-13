@@ -1,0 +1,148 @@
+Create and complete the public Lean 4 repository kim-em/isoperimetric, proving the full classical planar isoperimetric theorem for arbitrary rectifiable Jordan curves, including equality only for circles. Build on existing formalizations through pinned dependencies and carry the work through to a reproducible public repository with passing CI and checked final theorem axioms.
+
+Repository and scope
+
+Use /Users/kim/projects/lean/isoperimetric as the local repository directory and https://github.com/kim-em/isoperimetric as the GitHub repository. Create the repository if absent; use an existing repository if it is already present. Preserve existing work. This GOAL.txt is the handoff specification and should be retained in the repository. Use the authenticated gh CLI for repository setup and GitHub work. Commit and push the completed development and verify CI on the final pushed commit.
+
+The required theorem must match the mathematical scope of Freek Wiedijk's currently credited HOL Light theorem:
+https://www.cs.ru.nl/~freek/100/hol.html#43
+https://github.com/jrh13/hol-light/blob/master/100/isoperimetric.ml
+
+For every continuous, rectifiable, simple closed planar curve, let L be its geometric length and A the Lebesgue area of its bounded Jordan interior. Prove
+
+    4 * Real.pi * A <= L ^ 2
+
+and prove that equality implies that the image of the curve is a circle. Prove the converse for circles too, so that the final result characterizes equality.
+
+Cover nonconvex curves, either orientation, and arbitrary continuous rectifiable parametrizations. Smoothness, convexity, constant speed, a halfspace description, an assumed area formula, and externally supplied Fourier identities are not permitted hypotheses of the final theorem. Establish any parametrization and analytic properties needed by the proof.
+
+A concrete acceptable formulation uses:
+- gamma : Real -> EuclideanSpace Real (Fin 2);
+- ContinuousOn gamma (Set.Icc 0 1);
+- gamma 0 = gamma 1;
+- Set.InjOn gamma (Set.Ico 0 1);
+- BoundedVariationOn gamma (Set.Icc 0 1).
+
+Here Gamma is gamma '' Set.Icc 0 1, length is (eVariationOn gamma (Set.Icc 0 1)).toReal, and area is the real value of the actual Lebesgue volume of the bounded Jordan interior. Equivalent standard formulations using paths or interval subtypes are acceptable, provided that their equivalence to these geometric hypotheses is proved. Define the interior using connected components of the complement, or reuse MovingSofa's genuine Jordan interior; do not define area by a boundary integral or by the desired inequality.
+
+The equality conclusion should identify Gamma with Metric.sphere c r for some planar c and r > 0. Prove that the area and length are finite, that the interior is measurable and bounded, and that the length is positive under the stated simplicity hypotheses. Do not rely on toReal's behavior on infinite measures. Do not demand literal-ball rigidity for arbitrary measurable sets: null-set modifications make that a different and potentially false statement. The required rigidity theorem concerns Jordan curves.
+
+Existing sources to reuse
+
+1. Humanfia's complete geometric isoperimetric inequality.
+
+Git source:
+https://huggingface.co/datasets/humanfia-lab/lean-eval-source
+Audited dataset revision:
+6a6d9f67a91d546677321aeea559c2857b697635
+Lake package subdirectory:
+problems/isoperimetric_inequality
+Package name at that revision:
+isoperimetric_inequality
+Main theorem:
+Submission.isoperimetric
+Public workspace:
+https://huggingface.co/datasets/humanfia-lab/lean-eval-source/tree/6a6d9f67a91d546677321aeea559c2857b697635/problems/isoperimetric_inequality
+
+It proves, for n >= 2 and every bounded measurable B in EuclideanSpace Real (Fin n),
+
+    n^n * volume(B)^(n-1) * volume(closedBall 0 1)
+      <= euclideanHausdorffMeasure(n-1)(frontier B)^n.
+
+This uses genuine Mathlib volume, frontier, and Euclidean Hausdorff measure. Its boundary-measure bridge is proved, not assumed. The complete dependency closure of Submission.isoperimetric has already been independently compiled unchanged with Lean v4.32.0-rc1 and Mathlib revision 360da6fa66c1273b76b6b2d8c5666fd5ac2e3b56. Its only axioms are propext, Classical.choice, and Quot.sound.
+
+Consume this archive as a required dependency, preferably a pinned Lake Git dependency using the package subdirectory. Do not vendor the archive into this repository. The user has explicitly chosen dependency use; obtaining a different licence is not a prerequisite for this goal. Resolve routine dependency compatibility autonomously, using a reproducible dependency patch or pinned compatibility fork if necessary. Preserve attribution and record exactly what was changed.
+
+Challenge.lean is a benchmark template containing sorry. It is not imported by the actual solution. Import the completed Submission modules or Solution, and ensure Challenge is outside the final theorem's dependency closure.
+
+The archive does not establish circle equality or an explicit rectifiable-curve theorem. Those are work for this goal.
+
+2. MovingSofa's Jordan-curve, arclength, and geometric-area developments.
+
+Repository:
+https://github.com/deancureton/MovingSofa
+Inspected revision:
+4d5569131940815f47a9ccf3e90a4c5043c56127
+Relevant files:
+- MovingSofa/ForMathlib/MeasureTheory/Hausdorff/Arclength.lean
+- MovingSofa/Curve/Jordan/Interior.lean
+- MovingSofa/Curve/Jordan/Separation.lean
+- MovingSofa/Curve/Jordan/Parametrization.lean
+- MovingSofa/Curve/Jordan/SignedArea.lean
+- MovingSofa/Curve/Reparametrization.lean
+- MovingSofa/Analysis/Stieltjes/Smooth.lean
+
+In particular, hausdorffMeasure_image_Icc_eq_eVariationOn proves geometric Hausdorff length equals total variation for injective continuous bounded-variation arcs. Assemble the closed-loop version by splitting into arcs and accounting for their endpoint intersections. The raw-versus-normalized Hausdorff measure convention must be reconciled explicitly.
+
+curveArea_eq_jordanInterior_area identifies the Stieltjes boundary-area functional with actual enclosed Lebesgue area for oriented rectifiable Jordan curves. Reuse this bridge. Extending derivative-density identities from everywhere differentiable curves to absolutely continuous/Lipschitz curves may require additional work.
+
+3. Tau Ceti's sharp Wirtinger and loop-energy proofs.
+
+Repository:
+https://github.com/TauCetiProject/TauCeti
+Inspected revision:
+c7ae9d762d2bc9436e7c2ed5006e64ac24822b2d
+Relevant files:
+- TauCeti/Analysis/Fourier/Wirtinger.lean
+- TauCeti/Geometry/Symplectic/Isoperimetric.lean
+
+TauCeti.integral_norm_sub_average_sq_le proves sharp periodic Wirtinger from genuine Fourier coefficient identities and Parseval. ContinuousLinearMap.norm_integral_apply_apply_le and TauCeti.SymplecticForm.abs_integral_apply_le give the corresponding loop-energy bound. Their inspected signatures require derivatives everywhere on the interval; they do not directly cover arbitrary Lipschitz arclength parametrizations or supply circle rigidity.
+
+Require reusable dependencies where practical and build the needed strengthened statements locally. Check newer upstream versions before implementing missing lemmas. MovingSofa already declares a vendored TauCeti library with a limited set of modules; blindly requiring upstream TauCeti as well can introduce overlapping library/module names. Resolve this explicitly. A small attributed adaptation of the analytic proof into this repository's namespace may be cleaner than incompatible overlapping dependencies.
+
+Humanfia and MovingSofa have different audited Lean/Mathlib pins. Choose one reproducible common environment, resolve compatibility, and verify actual imports. Do not assume that independently compiling projects automatically compose.
+
+LeanPool's Jonathan Ho development contains Brunn-Minkowski and a finite-epsilon neighborhood-volume inequality. Humanfia already has Brunn-Minkowski machinery, and adding LeanPool does not supply the missing equality theorem. Only add it if a specific required result makes it useful.
+
+Suggested proof organization
+
+First fix the final geometric statement and definitions in a small module whose dependencies and meanings can be independently inspected. Keep this statement stable while developing the proof.
+
+A. Obtain the full curve inequality from Humanfia plus MovingSofa.
+- Establish the Jordan interior's frontier is Gamma.
+- Establish Hausdorff boundary length equals geometric curve length.
+- Specialize n = 2, prove the unit-disk volume normalization, and transfer the inequality to A and L.
+
+B. Develop usable arclength parametrization.
+- Reparametrize every permitted curve as a Lipschitz loop on [0,1] with speed L almost everywhere.
+- Prove preservation of the image, length, interior, and signed area, with orientation handled explicitly.
+- Do not assume that an arbitrary rectifiable parametrization is absolutely continuous.
+
+C. Prove the analytic rigidity argument at the regularity actually available.
+- Extend periodic integration by parts and the sharp Wirtinger estimate to absolutely continuous loops with square-integrable derivative, or to an equivalent rigorously proved integral representation.
+- Obtain a boundary integral formula for the actual area of the arclength-parametrized Jordan curve.
+- Deduce that equality in the geometric bound forces a circular parametrization.
+
+One promising route avoids a separate classification of equality in Brunn-Minkowski or Sobolev. For a positively oriented loop on [0,1], subtract its mean c, write z = gamma - c, let J be rotation by ninety degrees, and set
+
+    E = integral ||z'||^2,
+    X = integral ||z||^2,
+    A = (1/2) * integral det(z,z').
+
+Wirtinger gives E - (2*pi)^2 * X >= 0. Completing the square gives
+
+    E - 4*pi*A
+      = (1/2) * integral ||z' - 2*pi*J(z)||^2
+        + (1/2) * (E - (2*pi)^2 * X).
+
+For the arclength parametrization E = L^2. Equality therefore forces z' = 2*pi*J(z) almost everywhere. Solve this equation using absolute continuity to show the image is a circle, and handle reversed orientation. All identities and implications in this outline must be proved in Lean. An alternative complete proof is acceptable if it reduces the work; the final geometric scope remains fixed.
+
+D. Assemble the final theorem for the original arbitrary parametrization.
+- Prove the area-length inequality and equality iff the image is a circle.
+- Supply the positive-radius circle case and verify sharpness using actual geometric area and length.
+- Expose a concise public theorem with precisely the geometric hypotheses stated above.
+
+Smooth or convex cases may be useful internal milestones, but they do not complete this goal. General n-dimensional rigidity or a complete finite-perimeter library is not required.
+
+Validation and public deliverables
+
+- Pin Lean, Mathlib, and every external source revision; retain reproducible compatibility patches where needed.
+- Make the default build compile all new mathematical modules and the final theorem. Build only the necessary dependency modules, rather than entire unrelated projects.
+- Check the final inequality theorem, equality characterization, and essential newly introduced bridge theorems with #print axioms or a compiled axiom audit. Permit only propext, Classical.choice, and Quot.sound. Enforce these checks in CI.
+- Have no sorry, admit, custom axioms, native_decide, or kernel-checking bypasses in the final proof dependency closure. Benchmark templates outside that closure must not be used as facts.
+- Check that no new definition encodes an unproved analytic or geometric conclusion and that no strengthened hidden hypothesis weakens the advertised theorem.
+- Add a short README giving the exact final statement, the proof architecture, dependency pins and credits, build instructions, and the comparison with Freek's HOL theorem.
+- Push the completed work to kim-em/isoperimetric and confirm that CI passes on that commit. Provide permanent source links to the statements and their definitions.
+- Produce a ready-to-send catalogue entry for Freek with authorship and source links.
+
+Continue until the complete result and required verification are achieved. Do not stop with a plan, an inequality without rigidity, a smooth-only theorem, or an equality theorem contingent on unproved identities. Do not make an upstream Mathlib merge a prerequisite. If genuinely blocked, state the exact missing lemma and the strongest theorem actually proved; do not declare a weakened replacement to be completion.
