@@ -11,6 +11,10 @@ namespace Isoperimetric
 
 variable {γ : ℝ → Plane}
 
+/-- The Mathlib-only geometric definition agrees with MovingSofa's Jordan interior. -/
+theorem enclosed_eq_jordanInterior (γ : ℝ → Plane) :
+    enclosed γ = MovingSofa.jordanInterior (trace γ) := rfl
+
 theorem RectifiableJordan.trace_eq_image_Ico (h : RectifiableJordan γ) :
     trace γ = γ '' Ico 0 1 := by
   apply Subset.antisymm

@@ -16,6 +16,7 @@ theorem RectifiableJordan.memLp_centered_arclength (h : RectifiableJordan γ) (c
     MemLp (fun t ↦ arclengthParam γ t - c) 2 (volume.restrict (Icc (0 : ℝ) 1)) := by
   have hc : ContinuousOn (fun t ↦ arclengthParam γ t - c) (Icc 0 1) := by
     rw [← uIcc_of_le (by norm_num : (0 : ℝ) ≤ 1)]
+    -- Normalize the EuclideanSpace scalar instances in the AC subtraction API.
     with_unfolding_all exact
       h.absolutelyContinuousOnInterval_arclengthParam.continuousOn.sub continuousOn_const
   obtain ⟨C, hC⟩ := isCompact_Icc.exists_bound_of_continuousOn hc

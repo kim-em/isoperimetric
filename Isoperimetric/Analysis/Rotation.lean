@@ -1,8 +1,14 @@
 import Isoperimetric.Statement
+import Mathlib.Analysis.Complex.Basic
 
 noncomputable section
 
 namespace Isoperimetric
+
+/-- The squared Euclidean norm in the two planar coordinates. -/
+theorem plane_norm_sq (z : Plane) : ‖z‖ ^ 2 = z 0 ^ 2 + z 1 ^ 2 := by
+  rw [EuclideanSpace.norm_sq_eq]
+  simp [Fin.sum_univ_two, Real.norm_eq_abs, sq_abs]
 
 /-- The usual oriented planar determinant. -/
 def determinant (z v : Plane) : ℝ := z 0 * v 1 - z 1 * v 0
@@ -24,14 +30,14 @@ def quarterTurn : Plane →L[ℝ] Plane := quarterTurnLinear.toContinuousLinearM
 
 theorem norm_quarterTurn (z : Plane) : ‖quarterTurn z‖ = ‖z‖ := by
   apply (sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)).mp
-  simp only [MovingSofa.Point.norm_sq_eq, quarterTurn_zero, quarterTurn_one, neg_sq]
+  simp only [plane_norm_sq, quarterTurn_zero, quarterTurn_one, neg_sq]
   ring
 
 /-- The pointwise algebra behind the rigidity argument. -/
 theorem norm_sub_quarterTurn_sq (z v : Plane) (ω : ℝ) :
     ‖v - ω • quarterTurn z‖ ^ 2 =
       ‖v‖ ^ 2 + ω ^ 2 * ‖z‖ ^ 2 - 2 * ω * determinant z v := by
-  simp only [MovingSofa.Point.norm_sq_eq, PiLp.sub_apply, PiLp.smul_apply,
+  simp only [plane_norm_sq, PiLp.sub_apply, PiLp.smul_apply,
     quarterTurn_zero, quarterTurn_one, smul_eq_mul, determinant]
   ring
 

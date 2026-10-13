@@ -32,6 +32,7 @@ theorem RectifiableJordan.solve_rotational_ode (h : RectifiableJordan γ) (c : P
     exact hh.neg.cexp
   have heAC : AbsolutelyContinuousOnInterval e 0 1 := heC1.contDiffOn.absolutelyContinuousOnInterval
   have hqAC : AbsolutelyContinuousOnInterval q 0 1 := by
+    -- Complex multiplication is its scalar action; normalize those module instances.
     with_unfolding_all exact heAC.smul hzAC
   have heD (t : ℝ) : HasDerivAt e (-((ω : ℂ) * I) * e t) t := by
     have hi : HasDerivAt (fun s : ℝ ↦ -(((ω * s : ℝ) : ℂ) * I)) (-((ω : ℂ) * I)) t := by

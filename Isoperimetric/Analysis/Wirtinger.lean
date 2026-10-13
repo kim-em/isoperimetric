@@ -2,6 +2,7 @@
 Copyright (c) 2021 Heather Macbeth. All rights reserved.
 Copyright (c) 2026 The Tau Ceti contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison, Heather Macbeth, David Loeffler, The Tau Ceti contributors
 
 The Fourier coefficient algebra adapts Mathlib.Analysis.Fourier.AddCircle
 (Heather Macbeth and David Loeffler) at c32e1ec0d1eb5237ba344eee50162f45d5b0fc76.

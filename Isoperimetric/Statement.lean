@@ -1,4 +1,5 @@
-import MovingSofa.Curve.Jordan.Orientation
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Topology.Connected.Basic
 import Mathlib.Topology.EMetricSpace.BoundedVariation
 import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 
@@ -26,7 +27,8 @@ structure RectifiableJordan (γ : ℝ → Plane) : Prop where
 def trace (γ : ℝ → Plane) : Set Plane := γ '' Icc 0 1
 
 /-- The bounded connected components of the complement of the trace. -/
-def enclosed (γ : ℝ → Plane) : Set Plane := MovingSofa.jordanInterior (trace γ)
+def enclosed (γ : ℝ → Plane) : Set Plane :=
+  {p | p ∉ trace γ ∧ Bornology.IsBounded (connectedComponentIn (trace γ)ᶜ p)}
 
 /-- Geometric length; its finiteness must be proved before using `toReal`. -/
 def length (γ : ℝ → Plane) : ℝ := (eVariationOn γ (Icc 0 1)).toReal

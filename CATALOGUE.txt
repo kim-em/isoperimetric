@@ -16,9 +16,16 @@ continuous rectifiable parametrizations. It requires no smoothness or assumed
 area/Fourier identities. This matches the rectifiable simple closed curve scope
 of the HOL Light result listed for entry 43 and also proves the circle converse.
 
-Authorship: Kim Morrison, with Codex assistance; building on Mathlib, Humanfia's
-Lean Eval archive, MovingSofa, and the Tau Ceti contributors. Exact source pins,
-credits, compatibility patches, and build instructions are recorded in README.md.
+Suggested short catalogue credit:
+
+Lean 4 — Kim Morrison (with Codex), using Humanfia/Humanize's inequality and
+Dean Cureton's MovingSofa library, including Rado Kirov's Jordan curve theorem;
+built on Mathlib, with analytic proofs adapted from TauCeti.
+
+The Humanfia archive identifies a Humanize submission but does not name an
+individual proof author. MovingSofa was produced by Codex and Claude Code under
+Dean Cureton's direction; jordan_pick was produced under Rado Kirov's direction.
+Exact source pins, credits, and build instructions are recorded in README.md.
 
 Permanent source links:
 

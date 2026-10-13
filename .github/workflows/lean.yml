@@ -19,3 +19,5 @@ jobs:
         run: bash scripts/prepare-dependencies.sh
       - name: Compile and audit axioms
         run: bash scripts/check.sh
+      - name: Replay the final proof dependencies
+        run: bash scripts/replay-kernel.sh

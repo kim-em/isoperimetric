@@ -3,7 +3,7 @@ import Lean.Util.CollectAxioms
 
 open Lean Elab Command
 
-/-! Check every local theorem and the essential reused geometric bridges. -/
+/-! Check every local theorem, essential reused bridges, and auxiliary approximation results. -/
 run_cmd do
   let env ← getEnv
   if env.header.moduleNames.contains `Challenge then

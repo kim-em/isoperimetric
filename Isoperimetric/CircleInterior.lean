@@ -86,7 +86,7 @@ theorem jordanInterior_sphere (c : Plane) (r : ℝ) (hr : 0 < r) :
 
 theorem enclosed_of_trace_sphere {γ : ℝ → Plane} (c : Plane) (r : ℝ) (hr : 0 < r)
     (htrace : trace γ = sphere c r) : enclosed γ = ball c r := by
-  rw [enclosed, htrace, jordanInterior_sphere c r hr]
+  rw [enclosed_eq_jordanInterior, htrace, jordanInterior_sphere c r hr]
 
 theorem area_of_trace_sphere {γ : ℝ → Plane} (c : Plane) (r : ℝ) (hr : 0 < r)
     (htrace : trace γ = sphere c r) : area γ = Real.pi * r ^ 2 := by

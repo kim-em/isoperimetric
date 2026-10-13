@@ -3,8 +3,6 @@ import Mathlib.Analysis.ConstantSpeed
 
 noncomputable section
 
-set_option backward.isDefEq.respectTransparency false
-
 open Set MeasureTheory
 
 namespace Isoperimetric
@@ -67,6 +65,7 @@ theorem RectifiableJordan.hasConstantSpeed_arclengthParam (h : RectifiableJordan
   have hyφ : φ y ∈ Icc 0 (length γ) := himage ▸ mem_image_of_mem φ hy
   rw [h.hasUnitSpeed_unitSpeedParam hxφ hyφ]
   apply congrArg ENNReal.ofReal
+  -- Expose the NNReal coercion and the unit-speed coefficient in the scalar identity.
   with_unfolding_all change 1 * (length γ * y - length γ * x) = length γ * (y - x)
   ring
 

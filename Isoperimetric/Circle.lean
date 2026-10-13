@@ -41,6 +41,7 @@ theorem lipschitzWith_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
     LipschitzWith ⟨2 * Real.pi * r, by positivity⟩ (circleParam c r) := by
   apply lipschitzWith_of_nnnorm_deriv_le (fun t ↦ (hasDerivAt_circleParam c r t).differentiableAt)
   intro t
+  -- Normalize the NNReal coefficient and the EuclideanSpace norm instances.
   with_unfolding_all exact_mod_cast (norm_deriv_circleParam c r hr t).le
 
 theorem trace_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :

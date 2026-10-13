@@ -8,6 +8,8 @@ open Set MeasureTheory MeasureTheory.Measure
 
 namespace Isoperimetric
 
+-- The isometry's measurable-space instances need reducible unfolding in the
+-- measure-preserving rewrite. Restrict that elaboration setting to this theorem.
 set_option backward.isDefEq.respectTransparency false in
 /-- In dimension one the raw and Euclidean-normalized Hausdorff measures coincide. -/
 theorem euclideanHausdorffMeasure_one_eq_hausdorffMeasure

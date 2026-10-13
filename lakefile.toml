@@ -28,3 +28,4 @@ subDir = "problems/isoperimetric_inequality"
 
 [[lean_lib]]
 name = "Isoperimetric"
+globs = ["Isoperimetric.*"]
