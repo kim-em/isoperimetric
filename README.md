@@ -67,8 +67,12 @@ The target equality characterization, recorded as the unproved proposition
   scalar periodic Wirtinger inequality for absolutely continuous real functions
   with square-integrable derivative. It extends the Fourier coefficient
   integration-by-parts identity to this regularity, then uses genuine Parseval.
+- [Analysis/Planar.lean](Isoperimetric/Analysis/Planar.lean) proves that coordinate
+  derivatives agree with projections of the vector derivative almost everywhere,
+  then assembles scalar Wirtinger into the sharp planar estimate for the
+  arclength loop.
 - The remaining work is the actual-area bridge for an arbitrary oriented Jordan
-  loop, planar Wirtinger from the scalar result, almost-everywhere circular ODE
+  loop, the completion-of-squares argument and almost-everywhere circular ODE
   rigidity, and the positive-radius circle converse. The final combined theorem
   and catalogue entry must wait for those proofs.
 

@@ -8,3 +8,4 @@ import Isoperimetric.Energy
 import Isoperimetric.SignedArea
 import Isoperimetric.StieltjesDensity
 import Isoperimetric.Analysis.Wirtinger
+import Isoperimetric.Analysis.Planar
