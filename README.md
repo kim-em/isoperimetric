@@ -63,8 +63,12 @@ The target equality characterization, recorded as the unproved proposition
   [StieltjesDensity.lean](Isoperimetric/StieltjesDensity.lean) supplies the
   derivative density for absolutely continuous coordinates without assuming
   everywhere differentiability.
-- The remaining work is the analytic area bridge, orientation for an arbitrary
-  Jordan loop, sharp Wirtinger at this regularity, almost-everywhere circular ODE
+- [Analysis/Wirtinger.lean](Isoperimetric/Analysis/Wirtinger.lean) proves the sharp
+  scalar periodic Wirtinger inequality for absolutely continuous real functions
+  with square-integrable derivative. It extends the Fourier coefficient
+  integration-by-parts identity to this regularity, then uses genuine Parseval.
+- The remaining work is the actual-area bridge for an arbitrary oriented Jordan
+  loop, planar Wirtinger from the scalar result, almost-everywhere circular ODE
   rigidity, and the positive-radius circle converse. The final combined theorem
   and catalogue entry must wait for those proofs.
 
@@ -107,9 +111,11 @@ The source URL, package subdirectory, and revision remain those in the manifest.
 
 MovingSofa provides the Jordan separation and injective-arc Hausdorff length
 proofs. Mathlib supplies the measure normalization and unit-disk volume results.
-For the remaining analytic work, TauCeti revision
-`8014353f314435299acce5b6faa19d781530cfa2` was inspected: its sharp Wirtinger and
-symplectic loop bound still require derivatives everywhere. MovingSofa already
+The analytic module contains attributed adaptations of Mathlib's Fourier
+coefficient algebra and TauCeti's Parseval argument at revision
+`8014353f314435299acce5b6faa19d781530cfa2`, strengthening the real scalar theorem
+to absolute continuity. The upstream sharp Wirtinger and symplectic loop bound
+still require derivatives everywhere. MovingSofa already
 declares a vendored `TauCeti` library, so a second overlapping Lake dependency is
 not added.
 
