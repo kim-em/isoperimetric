@@ -53,8 +53,12 @@ The target equality characterization, recorded as the unproved proposition
   equal to the geometric length in the total-variation sense. It proves that
   this loop is again a rectifiable Jordan parametrization and preserves trace,
   length, enclosed set, and area.
-- The remaining work is almost-everywhere derivative speed and the analytic
-  area bridge, sharp Wirtinger at this regularity, almost-everywhere circular ODE
+- [Energy.lean](Isoperimetric/Energy.lean) proves that the arclength loop is
+  absolutely continuous, its derivative has norm equal to the geometric length
+  almost everywhere and belongs to `L²`, and its loop energy is the squared
+  geometric length.
+- The remaining work is the analytic area bridge, orientation for an arbitrary
+  Jordan loop, sharp Wirtinger at this regularity, almost-everywhere circular ODE
   rigidity, and the positive-radius circle converse. The final combined theorem
   and catalogue entry must wait for those proofs.
 
