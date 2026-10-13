@@ -30,22 +30,23 @@ Exact source pins, credits, and build instructions are recorded in README.md.
 Permanent source links:
 
 Public theorem, Isoperimetric.classical_isoperimetric (four geometric hypotheses):
-https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Main.lean#L37
+https://github.com/kim-em/isoperimetric/blob/b9ba5d2ec9a1f746010784c8485802d7199b3710/Isoperimetric/Main.lean#L46
 
 Geometric hypotheses and definitions of trace, length, and Jordan-interior area:
-https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Statement.lean#L18
+https://github.com/kim-em/isoperimetric/blob/b9ba5d2ec9a1f746010784c8485802d7199b3710/Isoperimetric/Statement.lean#L26
 
 Complete target proposition and its proof:
-https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Statement.lean#L38
-https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Main.lean#L46
+https://github.com/kim-em/isoperimetric/blob/b9ba5d2ec9a1f746010784c8485802d7199b3710/Isoperimetric/Statement.lean#L47
+https://github.com/kim-em/isoperimetric/blob/b9ba5d2ec9a1f746010784c8485802d7199b3710/Isoperimetric/Main.lean#L55
 
 Proof architecture, credits, and reproducible build:
-https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/README.md
+https://github.com/kim-em/isoperimetric/blob/b9ba5d2ec9a1f746010784c8485802d7199b3710/README.md
 
-The final theorem and all local mathematical theorems have been kernel checked
-and axiom audited. Their only axioms are propext, Classical.choice, and Quot.sound.
-The default build includes all mathematical modules; CI enforces compilation,
-the axiom audit, and exclusion of proof placeholders and kernel bypasses.
+The final proof dependencies have been replayed from an empty Lean kernel environment.
+All public and private local theorems are axiom audited; only propext,
+Classical.choice and Quot.sound are permitted. CI enforces compilation with Mathlib
+standard linters, the independent statement check, the axiom audit, kernel replay,
+and exclusion of proof placeholders and kernel bypasses.
 
 Best,
 Kim
