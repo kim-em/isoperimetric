@@ -48,7 +48,12 @@ The target equality characterization, recorded as the unproved proposition
   volume constant `π`.
 - [Inequality.lean](Isoperimetric/Inequality.lean) assembles the geometric
   inequality for the original arbitrary parametrization.
-- The remaining work is the Lipschitz arclength parametrization and its analytic
+- [Parametrization.lean](Isoperimetric/Parametrization.lean) uses Mathlib's natural
+  parametrization to construct a Lipschitz loop on `[0,1]`, with constant speed
+  equal to the geometric length in the total-variation sense. It proves that
+  this loop is again a rectifiable Jordan parametrization and preserves trace,
+  length, enclosed set, and area.
+- The remaining work is almost-everywhere derivative speed and the analytic
   area bridge, sharp Wirtinger at this regularity, almost-everywhere circular ODE
   rigidity, and the positive-radius circle converse. The final combined theorem
   and catalogue entry must wait for those proofs.
@@ -86,6 +91,9 @@ Humanfia is consumed as a Git dependency with the Lake package subdirectory
 `Submission/BrunnMinkowski/PrekopaLeindler.lean`. It changes no definitions or
 theorem statements. The preparation script checks the archive revision and
 applies the patch idempotently.
+The script fetches the Humanfia Git archive without partial-clone filters before
+Lake resolves it: the archive server's promised-blob fetches fail with HTTP 500.
+The source URL, package subdirectory, and revision remain those in the manifest.
 
 MovingSofa provides the Jordan separation and injective-arc Hausdorff length
 proofs. Mathlib supplies the measure normalization and unit-disk volume results.

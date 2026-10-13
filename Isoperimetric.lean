@@ -3,3 +3,4 @@ import Isoperimetric.Jordan
 import Isoperimetric.Boundary
 import Isoperimetric.Arclength
 import Isoperimetric.Inequality
+import Isoperimetric.Parametrization
