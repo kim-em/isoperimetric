@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.Connected.Basic
 import Mathlib.Topology.EMetricSpace.BoundedVariation
@@ -14,6 +19,7 @@ open Set MeasureTheory
 
 namespace Isoperimetric
 
+/-- The Euclidean plane, with its standard norm and Lebesgue volume. -/
 abbrev Plane := EuclideanSpace ℝ (Fin 2)
 
 /-- A continuous rectifiable once-traversal, with the two endpoints identified. -/
@@ -36,7 +42,8 @@ def length (γ : ℝ → Plane) : ℝ := (eVariationOn γ (Icc 0 1)).toReal
 /-- Actual Lebesgue area; its finiteness must be proved before using `toReal`. -/
 def area (γ : ℝ → Plane) : ℝ := (volume (enclosed γ)).toReal
 
-/-- The geometric target proposition, proved by `classicalIsoperimetric` in `Main.lean`. -/
+/-- The geometric target proposition,
+proved by `classical_isoperimetric_specification` in `Main.lean`. -/
 def ClassicalIsoperimetric : Prop :=
   ∀ (γ : ℝ → Plane), RectifiableJordan γ →
     4 * Real.pi * area γ ≤ length γ ^ 2 ∧

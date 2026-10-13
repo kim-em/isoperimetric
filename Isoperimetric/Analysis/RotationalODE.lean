@@ -1,5 +1,18 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Analysis.CompletionSquare
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+
+/-!
+# Solving the circular ODE under absolute continuity
+
+Multiply the complex representation of the centered loop by an integrating factor.
+Its derivative vanishes almost everywhere, so absolute continuity makes it constant. No
+pointwise differentiability assumption is needed.
+-/
 
 noncomputable section
 
@@ -8,22 +21,22 @@ open scoped Topology Real Interval
 
 namespace Isoperimetric
 
-variable {γ : ℝ → Plane}
+variable {η : ℝ → Plane}
 
 /-- Solve the rotational ODE using absolute continuity and an integrating factor. -/
-theorem RectifiableJordan.solve_rotational_ode (h : RectifiableJordan γ) (c : Plane) (ω : ℝ)
+theorem solve_rotational_ode (hac : AbsolutelyContinuousOnInterval η 0 1)
+    (c : Plane) (ω : ℝ)
     (hode : ∀ᵐ t ∂volume.restrict (Icc (0 : ℝ) 1),
-      deriv (arclengthParam γ) t = ω • quarterTurn (arclengthParam γ t - c)) :
+      deriv η t = ω • quarterTurn (η t - c)) :
     ∀ t ∈ Icc (0 : ℝ) 1,
-      planeComplex (arclengthParam γ t - c) =
-        Complex.exp (((ω * t : ℝ) : ℂ) * I) * planeComplex (arclengthParam γ 0 - c) := by
-  let η := arclengthParam γ
+      planeComplex (η t - c) =
+        Complex.exp (((ω * t : ℝ) : ℂ) * I) * planeComplex (η 0 - c) := by
   let z : ℝ → ℂ := fun t ↦ planeComplex (η t - c)
   let e : ℝ → ℂ := fun t ↦ Complex.exp (-(((ω * t : ℝ) : ℂ) * I))
   let q : ℝ → ℂ := fun t ↦ e t * z t
   have hzAC : AbsolutelyContinuousOnInterval z 0 1 :=
     planeComplex.toContinuousLinearMap.lipschitzWith.comp_absolutelyContinuousOnInterval
-      (h.absolutelyContinuousOnInterval_arclengthParam.sub
+      (hac.sub
         (LipschitzWith.const c).lipschitzOnWith.absolutelyContinuousOnInterval)
   have heC1 : ContDiff ℝ 1 e := by
     have hi : ContDiff ℝ 1 (fun t : ℝ ↦ ω * t) := contDiff_const.mul contDiff_id
@@ -42,16 +55,17 @@ theorem RectifiableJordan.solve_rotational_ode (h : RectifiableJordan γ) (c : P
         simp [Function.comp_apply, mul_comm]
       · simp
     simpa only [e, mul_comm] using hi.cexp
-  have hd := h.lipschitzOnWith_arclengthParam.ae_differentiableWithinAt (μ := volume) measurableSet_Icc
-  rw [← restrict_Ioo_eq_restrict_Icc] at hd hode
   have hqD : ∀ᵐ t ∂volume, t ∈ uIcc (0 : ℝ) 1 → HasDerivAt q 0 t := by
     rw [uIcc_of_le (by norm_num : (0 : ℝ) ≤ 1)]
     apply (ae_restrict_iff' measurableSet_Icc).mp
-    rw [← restrict_Ioo_eq_restrict_Icc]
-    filter_upwards [hd, hode, ae_restrict_mem measurableSet_Ioo] with t hdt hot hto
-    have hηD := (hdt.differentiableAt (Icc_mem_nhds hto.1 hto.2)).hasDerivAt
+    have hd : ∀ᵐ t ∂volume.restrict (Icc (0 : ℝ) 1), DifferentiableAt ℝ η t := by
+      rw [ae_restrict_iff' measurableSet_Icc]
+      simpa only [uIcc_of_le (by norm_num : (0 : ℝ) ≤ 1)] using
+        hac.boundedVariationOn.ae_differentiableAt_of_mem_uIcc
+    filter_upwards [hd, hode] with t hdt hot
+    have hηD := hdt.hasDerivAt
     have hzD : HasDerivAt z ((ω : ℂ) * I * z t) t := by
-      have hD : HasDerivAt z (planeComplex (deriv (arclengthParam γ) t)) t :=
+      have hD : HasDerivAt z (planeComplex (deriv η t)) t :=
         planeComplex.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt t (hηD.sub_const c)
       rw [hot, planeComplex.map_smul, planeComplex_quarterTurn] at hD
       simpa [z, smul_eq_mul, mul_assoc] using hD

@@ -1,6 +1,18 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Jordan
 import Mathlib.Analysis.Normed.Module.Connected
 import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
+
+/-!
+# Genuine enclosed area of a circle
+
+The bounded complement component of a positive-radius circle is its open disk. Exterior
+components are unbounded, as witnessed by rays. Lebesgue volume of the disk gives its area.
+-/
 
 noncomputable section
 
@@ -23,7 +35,8 @@ theorem connectedComponentIn_sphere_compl_of_mem_ball (c p : Plane) (r : ℝ)
     by_contra hqb
     have hqd : r ≤ dist q c := le_of_not_gt (by simpa [mem_ball] using hqb)
     have hpd : dist p c < r := mem_ball.mp hp
-    have hconn : IsPreconnected ((fun z : Plane ↦ dist z c) '' connectedComponentIn (sphere c r)ᶜ p) :=
+    have hconn : IsPreconnected ((fun z : Plane ↦ dist z c) '' connectedComponentIn (sphere c r)ᶜ
+      p) :=
       isPreconnected_connectedComponentIn.image _ (continuous_id.dist continuous_const).continuousOn
     have hrim : r ∈ (fun z : Plane ↦ dist z c) '' connectedComponentIn (sphere c r)ᶜ p :=
       hconn.ordConnected.out ⟨p, hpcomp, rfl⟩ ⟨q, hq, rfl⟩ ⟨hpd.le, hqd⟩
@@ -38,7 +51,8 @@ theorem sphere_compl_component_unbounded_of_lt (c p : Plane) (r : ℝ)
   let ray : ℝ → Plane := fun t ↦ c + t • (p - c)
   have hd : 0 < ‖p - c‖ := hr.trans (by simpa [dist_eq_norm] using hp)
   have hpre : IsPreconnected (ray '' Ici 1) :=
-    isPreconnected_Ici.image ray (continuous_const.add (continuous_id.smul continuous_const)).continuousOn
+    isPreconnected_Ici.image ray (continuous_const.add (continuous_id.smul
+      continuous_const)).continuousOn
   have hpray : p ∈ ray '' Ici 1 := by
     refine ⟨1, by simp, ?_⟩
     simp [ray]
@@ -72,7 +86,8 @@ theorem sphere_compl_component_unbounded_of_lt (c p : Plane) (r : ℝ)
 theorem jordanInterior_sphere (c : Plane) (r : ℝ) (hr : 0 < r) :
     MovingSofa.jordanInterior (sphere c r) = ball c r := by
   ext p
-  change (p ∉ sphere c r ∧ Bornology.IsBounded (connectedComponentIn (sphere c r)ᶜ p)) ↔ p ∈ ball c r
+  change (p ∉ sphere c r ∧ Bornology.IsBounded (connectedComponentIn (sphere c r)ᶜ p)) ↔ p ∈ ball
+    c r
   constructor
   · rintro ⟨hpn, hpb⟩
     by_contra hpout
@@ -84,10 +99,12 @@ theorem jordanInterior_sphere (c : Plane) (r : ℝ) (hr : 0 < r) :
     rw [connectedComponentIn_sphere_compl_of_mem_ball c p r hp]
     exact isBounded_ball
 
+/-- Every parametrization with a positive-radius circle image encloses exactly its open disk. -/
 theorem enclosed_of_trace_sphere {γ : ℝ → Plane} (c : Plane) (r : ℝ) (hr : 0 < r)
     (htrace : trace γ = sphere c r) : enclosed γ = ball c r := by
   rw [enclosed_eq_jordanInterior, htrace, jordanInterior_sphere c r hr]
 
+/-- Every parametrization with a positive-radius circle image has enclosed area `π * r²`. -/
 theorem area_of_trace_sphere {γ : ℝ → Plane} (c : Plane) (r : ℝ) (hr : 0 < r)
     (htrace : trace γ = sphere c r) : area γ = Real.pi * r ^ 2 := by
   rw [area, enclosed_of_trace_sphere c r hr htrace, EuclideanSpace.volume_ball_fin_two,

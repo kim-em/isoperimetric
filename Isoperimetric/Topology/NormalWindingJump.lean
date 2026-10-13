@@ -1,5 +1,18 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Topology.ArgumentJump
 import Isoperimetric.Topology.RegularPoint
+
+/-!
+# Unit winding jump across a regular point
+
+Use a short normal segment at a regular arclength point to construct a relative complex
+argument with exactly one downward branch-cut crossing. Its endpoint increment gives a
+winding difference of one between the two sides.
+-/
 
 noncomputable section
 
@@ -51,7 +64,7 @@ theorem curveWinding_normal_jump {a b : ℝ} (hab : a < b)
   let p := x c + α • quarterTurn v
   let q := x c - α • quarterTurn v
   let R := fun t ↦ starRingEnd ℂ (planeComplex (x t - q)) * planeComplex (x t - p)
-  have hV : V ≠ 0 := fun heq ↦ hv (planeComplex.injective (heq.trans (map_zero _).symm))
+  have hV : V ≠ 0 := fun heq ↦ hv (planeComplex.map_eq_zero_iff.mp heq)
   have hVnorm : 0 < ‖V‖ ^ 2 := sq_pos_of_pos (norm_pos_iff.mpr hV)
   have hp : p ∉ range x := by
     rintro ⟨t, ht⟩
@@ -76,7 +89,8 @@ theorem curveWinding_normal_jump {a b : ℝ} (hab : a < b)
   have hRe (t : Icc a b) : (R t).re = ‖V‖ ^ 2 * (‖w t‖ ^ 2 - α ^ 2) := by
     rw [hformula]
     simp only [Complex.mul_re, Complex.sub_re,
-      Complex.ofReal_re, Complex.ofReal_im, Complex.I_re, Complex.I_im, zero_mul, mul_zero, sub_zero]
+      Complex.ofReal_re, Complex.ofReal_im, Complex.I_re, Complex.I_im, zero_mul, mul_zero,
+        sub_zero]
   have hIm (t : Icc a b) : (R t).im = ‖V‖ ^ 2 * (-2 * α * (w t).re) := by
     rw [hformula]
     simp only [Complex.sub_im, Complex.mul_im,
@@ -143,8 +157,7 @@ theorem RectifiableJordan.exists_winding_jump {γ : ℝ → Plane} (h : Rectifia
         (fun t ↦ arclengthParam γ t) p -
       MovingSofa.curveWinding (by norm_num : (0 : ℝ) ≤ 1)
         (fun t ↦ arclengthParam γ t) q = 1 := by
-  obtain ⟨t, ht, v, hv, hd, β, hβ, hcross⟩ := h.exists_normal_crosscut
-  obtain ⟨δ, hδ, hsec⟩ := positive_secant_near_regular_parameter hd hv
+  obtain ⟨t, ht, v, hv, _, ⟨δ, hδ, hsec⟩, β, hβ, hcross⟩ := h.exists_normal_crosscut
   let x : Icc (0 : ℝ) 1 → Plane := fun s ↦ arclengthParam γ s
   let c : Icc (0 : ℝ) 1 := ⟨t, ht.1.le, ht.2.le⟩
   let α := β / 2

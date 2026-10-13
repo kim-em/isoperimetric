@@ -15,12 +15,21 @@ import Mathlib.Analysis.Fourier.AddCircle
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.AbsolutelyContinuousFun
 import Mathlib.MeasureTheory.Integral.IntervalAverage
 
+/-!
+# Sharp Wirtinger for absolutely continuous functions
+
+Extend Fourier integration by parts to absolutely continuous functions with square-integrable
+derivative. Parseval then gives the sharp scalar Wirtinger inequality on any nontrivial interval.
+The Fourier algebra and Parseval adaptations are attributed in the file header.
+-/
+
 noncomputable section
 open MeasureTheory Set Complex intervalIntegral
 open scoped Real Interval
 
 namespace Isoperimetric
 
+/-- Integration by parts for an absolutely continuous real function and a complex C¹ factor. -/
 theorem integral_mul_complex_deriv {a b : ℝ} {f : ℝ → ℝ} {g g' : ℝ → ℂ}
     (hf : AbsolutelyContinuousOnInterval f a b)
     (hg : ∀ x, HasDerivAt g (g' x) x) (hg' : Continuous g') :
@@ -43,7 +52,8 @@ theorem integral_mul_complex_deriv {a b : ℝ} {f : ℝ → ℝ} {g g' : ℝ →
   have hdim (x : ℝ) : deriv (fun y ↦ (g y).im) x = (g' x).im :=
     (imCLM.hasFDerivAt.comp_hasDerivAt x (hg x)).deriv
   have hL : IntervalIntegrable (fun x ↦ (f x : ℂ) * g' x) volume a b :=
-    ((Complex.continuous_ofReal.comp_continuousOn hf.continuousOn).mul hg'.continuousOn).intervalIntegrable
+    ((Complex.continuous_ofReal.comp_continuousOn hf.continuousOn).mul
+      hg'.continuousOn).intervalIntegrable
   have hD : IntervalIntegrable (fun x ↦ ((deriv f x : ℝ) : ℂ)) volume a b :=
     intervalIntegrable_iff.mpr (ofRealCLM.integrable_comp hf.intervalIntegrable_deriv.def')
   have hR : IntervalIntegrable (fun x ↦ ((deriv f x : ℝ) : ℂ) * g x) volume a b :=
@@ -70,7 +80,7 @@ theorem integral_mul_complex_deriv {a b : ℝ} {f : ℝ → ℝ} {g g' : ℝ →
     rw [hleft, Complex.sub_im, Complex.sub_im, hright]
     simpa using he
 
-/- This coefficient identity adapts Mathlib's Fourier coefficient integration-by-parts
+/-- This coefficient identity adapts Mathlib's Fourier coefficient integration-by-parts
 proof to an absolutely continuous real function. -/
 theorem fourierCoeffOn_of_absolutelyContinuous {a b : ℝ} (hab : a < b) {f : ℝ → ℝ}
     {n : ℤ} (hn : n ≠ 0) (hf : AbsolutelyContinuousOnInterval f a b) :
@@ -100,6 +110,7 @@ theorem fourierCoeffOn_of_absolutelyContinuous {a b : ℝ} (hab : a < b) {f : �
   · simp only [ofReal_sub]
     ring
 
+/-- Sharp mean-subtracted Wirtinger on any nontrivial interval, assuming AC and an L² derivative. -/
 theorem wirtinger_real {a b : ℝ} (hab : a < b) {f : ℝ → ℝ}
     (hf : AbsolutelyContinuousOnInterval f a b) (hfab : f a = f b)
     (hf' : MemLp (deriv f) 2 (volume.restrict (Ioc a b))) :

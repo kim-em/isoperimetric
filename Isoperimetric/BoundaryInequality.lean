@@ -1,6 +1,19 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Jordan
 import MovingSofa.ForMathlib.MeasureTheory.Hausdorff.Arclength
 import Submission
+
+/-!
+# Normalizing the geometric boundary inequality
+
+Reconcile raw and Euclidean-normalized Hausdorff measures in dimension one and specialize
+Humanfia's geometric isoperimetric inequality to two dimensions. This bridge keeps every
+normalization factor explicit.
+-/
 
 noncomputable section
 

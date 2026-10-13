@@ -1,7 +1,20 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Statement
 import MovingSofa.Curve.Jordan.Interior
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 import Mathlib.MeasureTheory.Measure.Typeclasses.Finite
+
+/-!
+# Jordan geometry and finiteness
+
+Descend the interval loop to a Jordan curve on the circle and invoke Jordan separation.
+The enclosed set is the bounded open component, has finite Lebesgue volume, and has frontier
+equal to the trace. The variation length is finite and strictly positive.
+-/
 
 noncomputable section
 
@@ -15,6 +28,7 @@ variable {γ : ℝ → Plane}
 theorem enclosed_eq_jordanInterior (γ : ℝ → Plane) :
     enclosed γ = MovingSofa.jordanInterior (trace γ) := rfl
 
+/-- Closedness lets the half-open unit interval represent the entire trace. -/
 theorem RectifiableJordan.trace_eq_image_Ico (h : RectifiableJordan γ) :
     trace γ = γ '' Ico 0 1 := by
   apply Subset.antisymm
@@ -49,11 +63,12 @@ theorem RectifiableJordan.isJordanCurve (h : RectifiableJordan γ) :
   refine ⟨f ∘ e.symm, hfc.comp e.symm.continuous, hfi.comp e.symm.injective, ?_⟩
   rw [range_comp, e.symm.surjective.range_eq, image_univ, hfr]
 
+/-- The trace of a continuous Jordan loop is compact. -/
 theorem RectifiableJordan.isCompact_trace (h : RectifiableJordan γ) :
     IsCompact (trace γ) := isCompact_Icc.image_of_continuousOn h.continuousOn
 
 /-- The set used to define area is the bounded open Jordan component. -/
-theorem RectifiableJordan.enclosed_properties (h : RectifiableJordan γ) :
+private theorem RectifiableJordan.enclosed_properties (h : RectifiableJordan γ) :
     IsOpen (enclosed γ) ∧ IsConnected (enclosed γ) ∧
       Bornology.IsBounded (enclosed γ) := by
   obtain ⟨U, V, hUo, _, hUc, _, hUb, hVb, _, hcover, _, _, hUcomp, hVcomp⟩ :=
@@ -74,15 +89,31 @@ theorem RectifiableJordan.enclosed_properties (h : RectifiableJordan γ) :
   rw [heq]
   exact ⟨hUo, hUc, hUb⟩
 
+/-- The enclosed Jordan region is open. -/
+theorem RectifiableJordan.isOpen_enclosed (h : RectifiableJordan γ) :
+    IsOpen (enclosed γ) := h.enclosed_properties.1
+
+/-- The enclosed Jordan region is connected and nonempty. -/
+theorem RectifiableJordan.isConnected_enclosed (h : RectifiableJordan γ) :
+    IsConnected (enclosed γ) := h.enclosed_properties.2.1
+
+/-- The enclosed Jordan region is bounded. -/
+theorem RectifiableJordan.isBounded_enclosed (h : RectifiableJordan γ) :
+    Bornology.IsBounded (enclosed γ) := h.enclosed_properties.2.2
+
+/-- The bounded open Jordan component is Lebesgue-measurable. -/
 theorem RectifiableJordan.measurableSet_enclosed (h : RectifiableJordan γ) :
-    MeasurableSet (enclosed γ) := h.enclosed_properties.1.measurableSet
+    MeasurableSet (enclosed γ) := h.isOpen_enclosed.measurableSet
 
+/-- Boundedness of the Jordan interior gives finite enclosed Lebesgue volume. -/
 theorem RectifiableJordan.volume_enclosed_ne_top (h : RectifiableJordan γ) :
-    volume (enclosed γ) ≠ ⊤ := h.enclosed_properties.2.2.measure_lt_top.ne
+    volume (enclosed γ) ≠ ⊤ := h.isBounded_enclosed.measure_lt_top.ne
 
+/-- The frontier of the bounded Jordan interior is precisely the curve trace. -/
 theorem RectifiableJordan.frontier_enclosed (h : RectifiableJordan γ) :
     frontier (enclosed γ) = trace γ := h.isJordanCurve.frontier_jordanInterior
 
+/-- Rectifiability ensures finite extended variation before taking its real value. -/
 theorem RectifiableJordan.eVariationOn_ne_top (h : RectifiableJordan γ) :
     eVariationOn γ (Icc 0 1) ≠ ⊤ := h.boundedVariationOn
 
@@ -105,6 +136,7 @@ theorem RectifiableJordan.eq_or_endpoints (h : RectifiableJordan γ)
     · exact Or.inl (h.injectiveOn ⟨hs.1, lt_of_le_of_ne hs.2 hs1⟩
         ⟨ht.1, lt_of_le_of_ne ht.2 ht1⟩ heq)
 
+/-- Simplicity prevents zero variation length. -/
 theorem RectifiableJordan.length_pos (h : RectifiableJordan γ) : 0 < length γ := by
   have hne : γ 0 ≠ γ (1 / 2) := by
     intro heq

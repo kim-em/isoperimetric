@@ -1,5 +1,19 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Topology.Orientation
 import Isoperimetric.Inequality
+import Isoperimetric.Circle
+
+/-!
+# Classical planar isoperimetry, including rigidity
+
+Assemble the geometric inequality, orientation-free circle rigidity and the circle converse.
+`classical_isoperimetric` exposes the four elementary hypotheses explicitly;
+`classical_isoperimetric_specification` proves the proposition recorded in the specification.
+-/
 
 noncomputable section
 
@@ -14,16 +28,11 @@ The original parametrization need only be continuous, closed, simple and rectifi
 theorem RectifiableJordan.circle_of_area_equality (h : RectifiableJordan γ)
     (heq : 4 * Real.pi * area γ = length γ ^ 2) :
     ∃ (c : Plane) (r : ℝ), 0 < r ∧ trace γ = Metric.sphere c r := by
-  obtain ⟨b, hb⟩ := h.exists_orientation_arclength
-  have ha := h.arclengthParam_isRectifiableJordan
-  have heq' : 4 * Real.pi * area (arclengthParam γ) = length (arclengthParam γ) ^ 2 := by
-    rw [h.area_arclengthParam, h.length_arclengthParam]
-    exact heq
-  obtain ⟨c, r, hr, htrace⟩ := ha.circle_of_area_equality_of_orientation b hb heq'
-  rw [h.trace_arclengthParam] at htrace
-  exact ⟨c, r, hr, htrace⟩
+  obtain ⟨b, hb⟩ := h.exists_orientation
+  exact h.circle_of_area_equality_of_orientation b hb heq
 
-/-- The full classical planar isoperimetric theorem, including equality exactly for circle images. -/
+/-- The full classical planar isoperimetric theorem,
+including equality exactly for circle images. -/
 theorem RectifiableJordan.classical_isoperimetric (h : RectifiableJordan γ) :
     4 * Real.pi * area γ ≤ length γ ^ 2 ∧
       (4 * Real.pi * area γ = length γ ^ 2 ↔
@@ -43,7 +52,7 @@ theorem classical_isoperimetric (γ : ℝ → EuclideanSpace ℝ (Fin 2))
   (⟨hcontinuous, hclosed, hsimple, hrectifiable⟩ : RectifiableJordan γ).classical_isoperimetric
 
 /-- The complete target proposition from the original specification. -/
-theorem classicalIsoperimetric : ClassicalIsoperimetric :=
+theorem classical_isoperimetric_specification : ClassicalIsoperimetric :=
   fun _ h ↦ h.classical_isoperimetric
 
 end Isoperimetric

@@ -1,5 +1,19 @@
-import Isoperimetric.Arclength
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
+import Isoperimetric.BoundaryLength
 import Mathlib.Analysis.ConstantSpeed
+
+/-!
+# Arclength normalization and its change of parameter
+
+Use Mathlib's natural parametrization to replace a continuous rectifiable Jordan loop by a
+Lipschitz loop of constant speed. The continuous monotone surjection `normalizedLengthMap`
+preserves both endpoints and factors the original loop through the normalized one. The
+trace, length, enclosed set and area are preserved.
+-/
 
 noncomputable section
 
@@ -12,18 +26,22 @@ variable {γ : ℝ → Plane}
 /-- The accumulated geometric length of the original, possibly non-AC parametrization. -/
 def accumulatedLength (γ : ℝ → Plane) : ℝ → ℝ := variationOnFromTo γ (Icc 0 1) 0
 
+/-- The initial accumulated length is zero. -/
 @[simp] theorem accumulatedLength_zero (γ : ℝ → Plane) : accumulatedLength γ 0 = 0 :=
   variationOnFromTo.self γ (Icc 0 1) 0
 
+/-- The final accumulated length is the full variation length. -/
 @[simp] theorem accumulatedLength_one (γ : ℝ → Plane) : accumulatedLength γ 1 = length γ := by
   simp [accumulatedLength, variationOnFromTo.eq_of_le, length]
 
+/-- A continuous BV curve has continuous accumulated length. -/
 theorem RectifiableJordan.continuousOn_accumulatedLength (h : RectifiableJordan γ) :
     ContinuousOn (accumulatedLength γ) (Icc 0 1) := by
   intro t ht
   exact (h.boundedVariationOn.continuousWithinAt_variationOnFromTo_iff
     (by norm_num : (0 : ℝ) ∈ Icc 0 1) ht).mpr (h.continuousOn t ht)
 
+/-- The accumulated length covers the entire interval from zero to the total length. -/
 theorem RectifiableJordan.accumulatedLength_image (h : RectifiableJordan γ) :
     accumulatedLength γ '' Icc 0 1 = Icc 0 (length γ) := by
   simpa using h.continuousOn_accumulatedLength.image_Icc_of_monotoneOn
@@ -34,12 +52,14 @@ theorem RectifiableJordan.accumulatedLength_image (h : RectifiableJordan γ) :
 /-- The natural parametrization on the interval of geometric lengths. -/
 def unitSpeedParam (γ : ℝ → Plane) : ℝ → Plane := naturalParameterization γ (Icc 0 1) 0
 
+/-- The natural parametrization recovers the original curve at its accumulated length. -/
 theorem RectifiableJordan.unitSpeedParam_accumulatedLength (h : RectifiableJordan γ)
     {t : ℝ} (ht : t ∈ Icc 0 1) :
     unitSpeedParam γ (accumulatedLength γ t) = γ t := by
   exact edist_eq_zero.mp (edist_naturalParameterization_eq_zero
     h.boundedVariationOn.locallyBoundedVariationOn (by norm_num) ht)
 
+/-- The natural parametrization has unit speed in the variation sense. -/
 theorem RectifiableJordan.hasUnitSpeed_unitSpeedParam (h : RectifiableJordan γ) :
     HasUnitSpeedOn (unitSpeedParam γ) (Icc 0 (length γ)) := by
   have hu := has_unit_speed_naturalParameterization γ
@@ -50,6 +70,7 @@ theorem RectifiableJordan.hasUnitSpeed_unitSpeedParam (h : RectifiableJordan γ)
 /-- The normalized arclength loop on the original parameter interval. -/
 def arclengthParam (γ : ℝ → Plane) (t : ℝ) : Plane := unitSpeedParam γ (length γ * t)
 
+/-- Rescaling natural parameters to the unit interval gives speed equal to the total length. -/
 theorem RectifiableJordan.hasConstantSpeed_arclengthParam (h : RectifiableJordan γ) :
     HasConstantSpeedOnWith (arclengthParam γ) (Icc 0 1) ⟨length γ, h.length_pos.le⟩ := by
   let φ : ℝ → ℝ := fun t ↦ length γ * t
@@ -70,7 +91,8 @@ theorem RectifiableJordan.hasConstantSpeed_arclengthParam (h : RectifiableJordan
   ring
 
 /-- Constant speed in the variation sense gives the required metric Lipschitz bound. -/
-theorem lipschitzOnWith_of_hasConstantSpeed {f : ℝ → Plane} {a b : ℝ} {C : NNReal}
+theorem lipschitzOnWith_of_hasConstantSpeed {X : Type*} [PseudoMetricSpace X]
+    {f : ℝ → X} {a b : ℝ} {C : NNReal}
     (hf : HasConstantSpeedOnWith f (Icc a b) C) : LipschitzOnWith C f (Icc a b) := by
   apply LipschitzOnWith.of_dist_le_mul
   intro x hx y hy
@@ -84,6 +106,7 @@ theorem lipschitzOnWith_of_hasConstantSpeed {f : ℝ → Plane} {a b : ℝ} {C :
   simpa [Real.dist_eq, abs_of_nonpos (sub_nonpos.mpr hxy), neg_sub,
     ENNReal.toReal_ofReal (sub_nonneg.mpr hxy)] using hr
 
+/-- The normalized arclength loop is Lipschitz with constant equal to the total length. -/
 theorem RectifiableJordan.lipschitzOnWith_arclengthParam (h : RectifiableJordan γ) :
     LipschitzOnWith ⟨length γ, h.length_pos.le⟩ (arclengthParam γ) (Icc 0 1) :=
   lipschitzOnWith_of_hasConstantSpeed h.hasConstantSpeed_arclengthParam
@@ -91,24 +114,66 @@ theorem RectifiableJordan.lipschitzOnWith_arclengthParam (h : RectifiableJordan 
 /-- The normalized length coordinate, preserving the original orientation. -/
 def normalizedLength (γ : ℝ → Plane) (t : ℝ) : ℝ := accumulatedLength γ t / length γ
 
+/-- The normalized length coordinate is monotone on the original interval. -/
+theorem RectifiableJordan.monotoneOn_normalizedLength (h : RectifiableJordan γ) :
+    MonotoneOn (normalizedLength γ) (Icc 0 1) := by
+  intro s hs t ht hst
+  exact div_le_div_of_nonneg_right
+    (variationOnFromTo.monotoneOn h.boundedVariationOn.locallyBoundedVariationOn
+      (by norm_num) hs ht hst) h.length_pos.le
+
+/-- The normalized length coordinate covers the unit interval. -/
 theorem RectifiableJordan.normalizedLength_image (h : RectifiableJordan γ) :
     normalizedLength γ '' Icc 0 1 = Icc 0 1 := by
   have hc : ContinuousOn (normalizedLength γ) (Icc 0 1) :=
     h.continuousOn_accumulatedLength.div_const _
-  have hm : MonotoneOn (normalizedLength γ) (Icc 0 1) := by
-    intro s hs t ht hst
-    exact div_le_div_of_nonneg_right
-      (variationOnFromTo.monotoneOn h.boundedVariationOn.locallyBoundedVariationOn
-        (by norm_num) hs ht hst) h.length_pos.le
   simpa [normalizedLength, h.length_pos.ne'] using
-    hc.image_Icc_of_monotoneOn (by norm_num : (0 : ℝ) ≤ 1) hm
+    hc.image_Icc_of_monotoneOn (by norm_num : (0 : ℝ) ≤ 1) h.monotoneOn_normalizedLength
 
+/-- The interval-valued length coordinate factors the original curve through its arclength loop. -/
+def RectifiableJordan.normalizedLengthMap (h : RectifiableJordan γ) :
+    Icc (0 : ℝ) 1 → Icc (0 : ℝ) 1 := fun t ↦
+  ⟨normalizedLength γ t, h.normalizedLength_image.subset (mem_image_of_mem _ t.property)⟩
+
+/-- The length coordinate is continuous even when the original parameter is not AC. -/
+theorem RectifiableJordan.continuous_normalizedLengthMap (h : RectifiableJordan γ) :
+    Continuous h.normalizedLengthMap := by
+  apply Continuous.subtype_mk
+  exact continuousOn_iff_continuous_domRestrict.mp
+    (h.continuousOn_accumulatedLength.div_const _)
+
+/-- The interval-valued length coordinate preserves order. -/
+theorem RectifiableJordan.monotone_normalizedLengthMap (h : RectifiableJordan γ) :
+    Monotone h.normalizedLengthMap := fun s t hst ↦
+  h.monotoneOn_normalizedLength s.property t.property hst
+
+/-- Every arclength parameter is attained by the length coordinate. -/
+theorem RectifiableJordan.surjective_normalizedLengthMap (h : RectifiableJordan γ) :
+    Function.Surjective h.normalizedLengthMap := by
+  intro t
+  obtain ⟨s, hs, hst⟩ := h.normalizedLength_image.symm.subset t.property
+  exact ⟨⟨s, hs⟩, Subtype.ext hst⟩
+
+/-- The change of parameter preserves the initial endpoint. -/
+@[simp] theorem RectifiableJordan.normalizedLengthMap_zero (h : RectifiableJordan γ) :
+    h.normalizedLengthMap ⟨0, by norm_num⟩ = ⟨0, by norm_num⟩ := by
+  apply Subtype.ext
+  simp [normalizedLengthMap, normalizedLength]
+
+/-- The change of parameter preserves the final endpoint. -/
+@[simp] theorem RectifiableJordan.normalizedLengthMap_one (h : RectifiableJordan γ) :
+    h.normalizedLengthMap ⟨1, by norm_num⟩ = ⟨1, by norm_num⟩ := by
+  apply Subtype.ext
+  simp [normalizedLengthMap, normalizedLength, h.length_pos.ne']
+
+/-- The normalized length coordinate factors the original curve through its arclength loop. -/
 theorem RectifiableJordan.arclengthParam_normalizedLength (h : RectifiableJordan γ)
     {t : ℝ} (ht : t ∈ Icc 0 1) : arclengthParam γ (normalizedLength γ t) = γ t := by
   dsimp [arclengthParam, normalizedLength]
   rw [mul_div_cancel₀ _ h.length_pos.ne']
   exact h.unitSpeedParam_accumulatedLength ht
 
+/-- Arclength normalization preserves all four rectifiable Jordan hypotheses. -/
 theorem RectifiableJordan.arclengthParam_isRectifiableJordan (h : RectifiableJordan γ) :
     RectifiableJordan (arclengthParam γ) := by
   have hzero : normalizedLength γ 0 = 0 := by simp [normalizedLength]
@@ -137,6 +202,7 @@ theorem RectifiableJordan.arclengthParam_isRectifiableJordan (h : RectifiableJor
   · simpa using h.hasConstantSpeed_arclengthParam.hasLocallyBoundedVariationOn
       0 1 (by norm_num) (by norm_num)
 
+/-- Arclength normalization preserves the geometric trace. -/
 theorem RectifiableJordan.trace_arclengthParam (h : RectifiableJordan γ) :
     trace (arclengthParam γ) = trace γ := by
   apply Subset.antisymm
@@ -147,17 +213,20 @@ theorem RectifiableJordan.trace_arclengthParam (h : RectifiableJordan γ) :
     refine ⟨normalizedLength γ t, h.normalizedLength_image ▸ mem_image_of_mem _ ht, ?_⟩
     exact (h.arclengthParam_normalizedLength ht).trans htp
 
+/-- Arclength normalization preserves variation length. -/
 theorem RectifiableJordan.length_arclengthParam (h : RectifiableJordan γ) :
     length (arclengthParam γ) = length γ := by
   unfold length
   rw [← h.arclengthParam_isRectifiableJordan.hausdorffMeasure_trace,
     h.trace_arclengthParam, h.hausdorffMeasure_trace]
 
+/-- Arclength normalization preserves the bounded complement component. -/
 theorem RectifiableJordan.enclosed_arclengthParam (h : RectifiableJordan γ) :
     enclosed (arclengthParam γ) = enclosed γ := by
   unfold enclosed
   rw [h.trace_arclengthParam]
 
+/-- Arclength normalization preserves enclosed Lebesgue area. -/
 theorem RectifiableJordan.area_arclengthParam (h : RectifiableJordan γ) :
     area (arclengthParam γ) = area γ := by
   unfold area

@@ -41,7 +41,8 @@ is retained unchanged in [GOAL.txt](GOAL.txt).
 - [Parametrization.lean](Isoperimetric/Parametrization.lean) and
   [Energy.lean](Isoperimetric/Energy.lean) construct an absolutely continuous
   Lipschitz loop with speed `L` almost everywhere, preserving image, length,
-  interior, area, and signed Stieltjes area. Its energy is `L²`.
+  interior and area. [SignedArea.lean](Isoperimetric/SignedArea.lean) proves signed
+  Stieltjes area is preserved too. The normalized loop’s energy is `L²`.
 - [Topology/Orientation.lean](Isoperimetric/Topology/Orientation.lean) derives
   winding orientation from the geometric hypotheses. At a regular arclength
   point a short normal segment meets the curve once. A continuous argument
@@ -51,18 +52,17 @@ is retained unchanged in [GOAL.txt](GOAL.txt).
   boundary functional with actual Lebesgue area, handling reversal explicitly.
 - [Analysis/Wirtinger.lean](Isoperimetric/Analysis/Wirtinger.lean) extends Fourier
   integration by parts and sharp Wirtinger to absolute continuity with an `L²`
-  derivative. The planar estimate and completion of squares force the rotational
+  derivative. [Analysis/Loop.lean](Isoperimetric/Analysis/Loop.lean) and the rest of
+  the analytic layer work for any closed absolutely continuous loop with L² velocity,
+  independently of Jordan geometry. [Rigidity.lean](Isoperimetric/Rigidity.lean)
+  applies these results to the arclength loop. The planar estimate and completion
+  of squares force the rotational
   ODE almost everywhere at equality. Absolute continuity solves this ODE with
   an integrating factor; its image is a positive-radius circle.
 - [Circle.lean](Isoperimetric/Circle.lean) and
   [CircleInterior.lean](Isoperimetric/CircleInterior.lean) prove circle length
   `2 * π * r` and genuine interior area `π * r²`, including the equality converse
   for every permitted parametrization with that image.
-
-TauCeti's endpoint-preserving smooth approximation is also reused in
-[Topology/SmoothApproximation.lean](Isoperimetric/Topology/SmoothApproximation.lean),
-which proves approximation preserving topological winding. The final orientation
-proof uses a direct continuous argument jump and does not require smooth approximation.
 
 ## Build and audit
 
@@ -74,13 +74,16 @@ bash scripts/check.sh
 ```
 
 The default build compiles every local mathematical module and only the needed
-dependency modules. [AxiomAudit.lean](AxiomAudit.lean) checks all local theorems,
+dependency modules. [AxiomAudit.lean](AxiomAudit.lean) checks all public and private
+local theorems,
 the final inequality and equality characterization, and essential reused bridges.
 Only `propext`, `Classical.choice`, and `Quot.sound` are allowed.
 [StatementCheck.lean](StatementCheck.lean) separately checks the final statement
 and finiteness against literal Mathlib expressions, without the project's
-geometric definitions. CI enforces the build, audit, and absence of local proof
-placeholders or bypasses. [scripts/replay-kernel.sh](scripts/replay-kernel.sh)
+geometric definitions. Every local module runs Mathlib’s standard linters, with
+warnings treated as errors.
+CI enforces this build, the audit, and absence of local proof placeholders or
+bypasses. [scripts/replay-kernel.sh](scripts/replay-kernel.sh)
 exports the final declarations and their proof dependencies, then replays them
 with Lean's kernel from an empty environment. CI runs this separately; it also
 works locally after the build. Humanfia's incomplete `Challenge` benchmark
@@ -100,7 +103,6 @@ Parseval argument, strengthened to absolute continuity.
 | Mathlib | `c32e1ec0d1eb5237ba344eee50162f45d5b0fc76` |
 | [Humanfia Lean Eval archive](https://huggingface.co/datasets/humanfia-lab/lean-eval-source/tree/6a6d9f67a91d546677321aeea559c2857b697635/problems/isoperimetric_inequality) | `6a6d9f67a91d546677321aeea559c2857b697635` |
 | [MovingSofa](https://github.com/deancureton/MovingSofa/tree/4d5569131940815f47a9ccf3e90a4c5043c56127) | `4d5569131940815f47a9ccf3e90a4c5043c56127` |
-| [TauCeti](https://github.com/TauCetiProject/TauCeti/tree/aa1f50f094b85057c11f0bb07177ff27a32dbd7f) | `aa1f50f094b85057c11f0bb07177ff27a32dbd7f` |
 
 MovingSofa's README attributes its Lean code to Codex and Claude Code under Dean
 Cureton's direction. Its Jordan separation uses `jordan_pick`, directed by Rado
@@ -116,12 +118,10 @@ with package subdirectory `problems/isoperimetric_inequality`, not vendored.
 statement. The archive is cloned without partial-clone filters because its
 promised-blob fetches fail with HTTP 500.
 
-[The MovingSofa configuration patch](patches/movingsofa-upstream-tauceti.patch)
-removes its vendored TauCeti library declaration. The upstream dependency becomes
-the sole provider of TauCeti modules; no mathematical source is changed. The
-preparation script checks source pins and applies both patches idempotently.
-The imported TauCeti modules compile with the root pins without a source patch.
-The adapted Wirtinger source revision is `8014353f314435299acce5b6faa19d781530cfa2`.
+The preparation script checks source pins and applies the Humanfia patch idempotently.
+MovingSofa's source and configuration are used unchanged. TauCeti is credited for the local
+[Wirtinger](https://github.com/TauCetiProject/TauCeti/blob/8014353f314435299acce5b6faa19d781530cfa2/TauCeti/Analysis/Fourier/Wirtinger.lean)
+adaptation rather than required as an additional package.
 
 ## Catalogue comparison
 
@@ -130,7 +130,3 @@ This proves the full rectifiable simple closed curve scope of
 and [HOL Light's `ISOPERIMETRIC_THEOREM`](https://github.com/jrh13/hol-light/blob/master/100/isoperimetric.ml),
 and also proves the circle converse and positivity of its radius.
 A ready-to-send catalogue entry is provided in [CATALOGUE.txt](CATALOGUE.txt).
-
-The requested macOS path `/Users/kim/projects/lean/isoperimetric` is not writable
-on this Linux host. The working repository is `/home/kim/isoperimetric`; the build
-is independent of its absolute path.

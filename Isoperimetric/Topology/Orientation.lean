@@ -1,5 +1,18 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Topology.NormalWindingJump
 import Isoperimetric.GeometricArea
+
+/-!
+# Winding orientation from Jordan geometry
+
+Winding is constant on each complement component and vanishes on the unbounded one. A local
+unit jump forces winding to be uniformly positive or negative one on the interior. Transport
+this orientation through the endpoint-preserving length coordinate to the original loop.
+-/
 
 noncomputable section
 
@@ -86,5 +99,41 @@ theorem RectifiableJordan.exists_orientation_arclength {γ : ℝ → Plane} (h :
   intro s hs t ht heq
   apply Subtype.ext
   exact ha.injectiveOn ⟨s.property.1, hs⟩ ⟨t.property.1, ht⟩ heq
+
+/-- Arclength normalization preserves winding around every point off the trace. -/
+theorem RectifiableJordan.curveWinding_arclengthParam {γ : ℝ → Plane}
+    (h : RectifiableJordan γ) {p : Plane} (hp : p ∉ trace γ) :
+    MovingSofa.curveWinding (by norm_num : (0 : ℝ) ≤ 1)
+      h.arclengthParam_isRectifiableJordan.bvPath.val p =
+    MovingSofa.curveWinding (by norm_num : (0 : ℝ) ≤ 1) h.bvPath.val p := by
+  let ha := h.arclengthParam_isRectifiableJordan
+  have hp' : p ∉ range ha.bvPath.val := by
+    rw [ha.range_bvPath, h.trace_arclengthParam]
+    exact hp
+  obtain ⟨θ, hθ⟩ := MovingSofa.exists_curveAngleLift_of_avoids
+    (by norm_num : (0 : ℝ) < 1) ha.bvPath.property.1 hp'
+  have hfactor : h.bvPath.val = ha.bvPath.val ∘ h.normalizedLengthMap := by
+    funext t
+    exact (h.arclengthParam_normalizedLength t.property).symm
+  rw [hfactor, MovingSofa.curveWinding_comp_of_endpoints
+    (by norm_num : (0 : ℝ) ≤ 1) (by norm_num : (0 : ℝ) ≤ 1)
+    ⟨θ, hθ⟩ h.continuous_normalizedLengthMap
+    h.normalizedLengthMap_zero h.normalizedLengthMap_one]
+
+/-- Every continuous rectifiable simple loop has a winding orientation, including
+parametrizations with singular, non-AC speed. -/
+theorem RectifiableJordan.exists_orientation {γ : ℝ → Plane} (h : RectifiableJordan γ) :
+    ∃ b : Bool, MovingSofa.IsOrientedJordanParametrization (by norm_num : (0 : ℝ) ≤ 1)
+      (trace γ) b h.bvPath.val := by
+  obtain ⟨b, _, _, _, _, _, _, hwind⟩ := h.exists_orientation_arclength
+  refine ⟨b, by norm_num, h.isJordanCurve, h.bvPath.property.1, h.range_bvPath,
+    h.closed, ?_, ?_⟩
+  · intro s hs t ht heq
+    apply Subtype.ext
+    exact h.injectiveOn ⟨s.property.1, hs⟩ ⟨t.property.1, ht⟩ heq
+  · intro p hp
+    rw [← h.curveWinding_arclengthParam hp.1]
+    apply hwind p
+    rwa [h.trace_arclengthParam]
 
 end Isoperimetric

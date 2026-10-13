@@ -1,6 +1,20 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.CircleInterior
 import Isoperimetric.Analysis.CircularImage
+import Isoperimetric.BoundaryLength
 import Mathlib.Analysis.Calculus.MeanValue
+
+/-!
+# Circle length and the equality converse
+
+Construct the standard once-traversed circle, compute its derivative and Hausdorff length,
+and combine these with the disk area calculation. Any rectifiable Jordan parametrization
+with the same circle image attains equality.
+-/
 
 noncomputable section
 
@@ -13,6 +27,7 @@ namespace Isoperimetric
 def circleParam (c : Plane) (r t : ℝ) : Plane :=
   c + r • planeComplex.symm (Complex.exp (((2 * Real.pi * t : ℝ) : ℂ) * I))
 
+/-- The velocity of the standard circle parametrization. -/
 theorem hasDerivAt_circleParam (c : Plane) (r t : ℝ) :
     HasDerivAt (circleParam c r)
       (r • planeComplex.symm (((2 * Real.pi : ℝ) : ℂ) * I *
@@ -27,8 +42,10 @@ theorem hasDerivAt_circleParam (c : Plane) (r t : ℝ) :
   have he : HasDerivAt (fun s : ℝ ↦ Complex.exp (((2 * Real.pi * s : ℝ) : ℂ) * I))
       (((2 * Real.pi : ℝ) : ℂ) * I * Complex.exp (((2 * Real.pi * t : ℝ) : ℂ) * I)) t := by
     simpa only [mul_comm] using hi.cexp
-  exact ((planeComplex.symm.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt t he).const_smul r).const_add c
+  exact ((planeComplex.symm.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt t he).const_smul
+    r).const_add c
 
+/-- The standard positive-radius circle has constant speed `2 * π * r`. -/
 theorem norm_deriv_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) (t : ℝ) :
     ‖deriv (circleParam c r) t‖ = 2 * Real.pi * r := by
   rw [(hasDerivAt_circleParam c r t).deriv, norm_smul, planeComplex.symm.norm_map]
@@ -37,6 +54,7 @@ theorem norm_deriv_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) (t : ℝ) :
     abs_of_pos (by positivity : 0 < 2 * Real.pi)]
   ring
 
+/-- The constant-speed circle parametrization is globally Lipschitz. -/
 theorem lipschitzWith_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
     LipschitzWith ⟨2 * Real.pi * r, by positivity⟩ (circleParam c r) := by
   apply lipschitzWith_of_nnnorm_deriv_le (fun t ↦ (hasDerivAt_circleParam c r t).differentiableAt)
@@ -44,6 +62,7 @@ theorem lipschitzWith_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
   -- Normalize the NNReal coefficient and the EuclideanSpace norm instances.
   with_unfolding_all exact_mod_cast (norm_deriv_circleParam c r hr t).le
 
+/-- A single revolution of the standard parametrization has exactly the circle as its image. -/
 theorem trace_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
     trace (circleParam c r) = Metric.sphere c r := by
   have hfull := exp_fullTurn_image 1 (by norm_num)
@@ -69,6 +88,7 @@ theorem trace_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
       simpa only [Complex.real_smul] using mul_div_cancel₀ (planeComplex (p - c)) hrC
     exact sub_left_inj.mp hdiff
 
+/-- The standard once-traversed positive-radius circle is a rectifiable Jordan loop. -/
 theorem rectifiableJordan_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
     RectifiableJordan (circleParam c r) := by
   have hlip := lipschitzWith_circleParam c r hr
@@ -78,7 +98,8 @@ theorem rectifiableJordan_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
     have he : planeComplex.symm (Complex.exp (((2 * Real.pi * s : ℝ) : ℂ) * I)) =
         planeComplex.symm (Complex.exp (((2 * Real.pi * t : ℝ) : ℂ) * I)) := by
       have he := congrArg (fun z : Plane ↦ r⁻¹ • (z - c)) hst
-      simpa only [circleParam, add_sub_cancel_left, smul_smul, inv_mul_cancel₀ hr.ne', one_smul] using he
+      simpa only [circleParam, add_sub_cancel_left, smul_smul, inv_mul_cancel₀ hr.ne', one_smul]
+        using he
     have heC := planeComplex.symm.injective he
     have heCircle : Circle.exp (2 * Real.pi * s) = Circle.exp (2 * Real.pi * t) :=
       Subtype.ext heC
@@ -96,6 +117,7 @@ theorem rectifiableJordan_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
       exact ENNReal.ofReal_ne_top
     exact hlip.comp_boundedVariationOn hid
 
+/-- The variation length of the standard circle is its circumference. -/
 theorem length_circleParam (c : Plane) (r : ℝ) (hr : 0 < r) :
     length (circleParam c r) = 2 * Real.pi * r := by
   have hv := eVariationOn_eq_ofReal_integral_norm_deriv (by norm_num : (0 : ℝ) ≤ 1)

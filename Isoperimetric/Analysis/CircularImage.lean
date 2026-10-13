@@ -1,4 +1,16 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Analysis.RotationalODE
+
+/-!
+# Circle images from the rotational ODE
+
+A full turn of the complex exponential covers the unit circle in either orientation.
+The ODE solution therefore gives a circle image; nonconstancy rules out zero radius.
+-/
 
 noncomputable section
 
@@ -23,7 +35,8 @@ theorem exp_fullTurn_image (ε : ℝ) (hε : ε ^ 2 = 1) :
         (by norm_num : (0 : ℝ) ≤ 1)
         (fun x _ y _ hxy ↦ mul_le_mul_of_nonneg_left hxy (by positivity : 0 ≤ 2 * Real.pi))
     simp only [one_mul]
-    change ((fun θ : ℝ ↦ Complex.exp ((θ : ℂ) * I)) ∘ (fun t : ℝ ↦ (2 * Real.pi) * t)) '' Icc 0 1 = _
+    change ((fun θ : ℝ ↦ Complex.exp ((θ : ℂ) * I)) ∘ (fun t : ℝ ↦ (2 * Real.pi) * t)) '' Icc 0 1
+      = _
     rw [image_comp, hφ]
     have hperiod := exp_real_periodic.image_Icc (a := 0) (by positivity : 0 < 2 * Real.pi)
     simpa using hperiod.trans Complex.range_exp_mul_I
@@ -33,46 +46,45 @@ theorem exp_fullTurn_image (ε : ℝ) (hε : ε ^ 2 = 1) :
         (fun x _ y _ hxy ↦ mul_le_mul_of_nonpos_left hxy
           (neg_nonpos.mpr (by positivity : 0 ≤ 2 * Real.pi)))
     simp only [neg_one_mul]
-    change ((fun θ : ℝ ↦ Complex.exp ((θ : ℂ) * I)) ∘ (fun t : ℝ ↦ -(2 * Real.pi) * t)) '' Icc 0 1 = _
+    change ((fun θ : ℝ ↦ Complex.exp ((θ : ℂ) * I)) ∘ (fun t : ℝ ↦ -(2 * Real.pi) * t)) '' Icc 0 1
+      = _
     rw [image_comp, hφ]
-    have hperiod := exp_real_periodic.image_Icc (a := -(2 * Real.pi)) (by positivity : 0 < 2 * Real.pi)
+    have hperiod := exp_real_periodic.image_Icc (a := -(2 * Real.pi)) (by positivity : 0 < 2 *
+      Real.pi)
     simpa using hperiod.trans Complex.range_exp_mul_I
 
-variable {γ : ℝ → Plane}
+variable {η : ℝ → Plane}
 
-/-- The ODE's amplitude cannot vanish for a Jordan once-traversal. -/
-theorem RectifiableJordan.rotational_amplitude_pos (h : RectifiableJordan γ) (c : Plane) (ω : ℝ)
+/-- The ODE's amplitude cannot vanish for a nonconstant loop. -/
+theorem ACLoop.rotational_amplitude_pos (h : ACLoop η) (hne : ∃ t ∈ Icc (0 : ℝ) 1, η t ≠ η 0)
+    (c : Plane) (ω : ℝ)
     (hode : ∀ᵐ t ∂volume.restrict (Icc (0 : ℝ) 1),
-      deriv (arclengthParam γ) t = ω • quarterTurn (arclengthParam γ t - c)) :
-    0 < ‖arclengthParam γ 0 - c‖ := by
+      deriv η t = ω • quarterTurn (η t - c)) :
+    0 < ‖η 0 - c‖ := by
   apply norm_pos_iff.mpr
   intro hz
-  have hsol := h.solve_rotational_ode c ω hode
-  have hh := hsol (1 / 2) (by norm_num)
+  have hsol := solve_rotational_ode h.absolutelyContinuous c ω hode
+  obtain ⟨t, ht, hne⟩ := hne
+  have hh := hsol t ht
   rw [hz, map_zero, mul_zero] at hh
-  have hhalf : arclengthParam γ (1 / 2) - c = 0 := planeComplex.injective (hh.trans (map_zero _).symm)
-  have heq : arclengthParam γ 0 = arclengthParam γ (1 / 2) :=
-    (sub_eq_zero.mp hz).trans (sub_eq_zero.mp hhalf).symm
-  have ht := h.arclengthParam_isRectifiableJordan.injectiveOn
-    (by norm_num : (0 : ℝ) ∈ Ico 0 1) (by norm_num : (1 / 2 : ℝ) ∈ Ico 0 1) heq
-  norm_num at ht
+  have htzero : η t - c = 0 := planeComplex.map_eq_zero_iff.mp hh
+  exact hne ((sub_eq_zero.mp htzero).trans (sub_eq_zero.mp hz).symm)
 
-/-- A Jordan loop solving the full-turn ODE has exactly a positive-radius circle image. -/
-theorem RectifiableJordan.trace_eq_sphere_of_rotational_ode (h : RectifiableJordan γ)
+/-- A nonconstant AC loop solving the full-turn ODE has exactly a positive-radius circle image. -/
+theorem ACLoop.image_eq_sphere_of_rotational_ode (h : ACLoop η)
+    (hne : ∃ t ∈ Icc (0 : ℝ) 1, η t ≠ η 0)
     (c : Plane) (ε : ℝ) (hε : ε ^ 2 = 1)
     (hode : ∀ᵐ t ∂volume.restrict (Icc (0 : ℝ) 1),
-      deriv (arclengthParam γ) t =
-        (ε * (2 * Real.pi)) • quarterTurn (arclengthParam γ t - c)) :
-    trace γ = Metric.sphere c ‖arclengthParam γ 0 - c‖ := by
-  let η := arclengthParam γ
+      deriv η t =
+        (ε * (2 * Real.pi)) • quarterTurn (η t - c)) :
+    η '' Icc 0 1 = Metric.sphere c ‖η 0 - c‖ := by
   let a := planeComplex (η 0 - c)
-  have hsol := h.solve_rotational_ode c (ε * (2 * Real.pi)) hode
-  have hr := h.rotational_amplitude_pos c (ε * (2 * Real.pi)) hode
+  have hsol := solve_rotational_ode h.absolutelyContinuous c (ε * (2 * Real.pi)) hode
+  have hr := h.rotational_amplitude_pos hne c (ε * (2 * Real.pi)) hode
   have ha : a ≠ 0 := by
     intro ha0
-    have hzero : η 0 - c = 0 := planeComplex.injective (ha0.trans (map_zero _).symm)
+    have hzero : η 0 - c = 0 := planeComplex.map_eq_zero_iff.mp ha0
     exact hr.ne' (by rw [hzero, norm_zero])
-  rw [← h.trace_arclengthParam]
   apply Subset.antisymm
   · rintro p ⟨t, ht, rfl⟩
     rw [Metric.mem_sphere, dist_eq_norm]
@@ -93,13 +105,13 @@ theorem RectifiableJordan.trace_eq_sphere_of_rotational_ode (h : RectifiableJord
     exact sub_left_inj.mp (planeComplex.injective heq)
 
 /-- Analytic rigidity at signed-area equality, without smoothness assumptions. -/
-theorem RectifiableJordan.circle_of_signedArea_equality (h : RectifiableJordan γ)
+theorem ACLoop.circle_of_signedArea_equality (h : ACLoop η) (hne : ∃ t ∈ Icc (0 : ℝ) 1, η t ≠ η 0)
     (ε : ℝ) (hε : ε ^ 2 = 1)
-    (heq : length γ ^ 2 = 4 * Real.pi * ε *
-      MovingSofa.curveAreaFunctional h.arclengthParam_isRectifiableJordan.bvPath) :
-    ∃ (c : Plane) (r : ℝ), 0 < r ∧ trace γ = Metric.sphere c r := by
+    (heq : loopEnergy η = 4 * Real.pi * ε *
+      signedBoundaryArea η) :
+    ∃ (c : Plane) (r : ℝ), 0 < r ∧ η '' Icc 0 1 = Metric.sphere c r := by
   have hode := h.rotational_ode_of_signedArea_equality ε hε heq
-  exact ⟨arclengthMean γ, ‖arclengthParam γ 0 - arclengthMean γ‖,
-    h.rotational_amplitude_pos _ _ hode, h.trace_eq_sphere_of_rotational_ode _ ε hε hode⟩
+  exact ⟨loopMean η, ‖η 0 - loopMean η‖,
+    h.rotational_amplitude_pos hne _ _ hode, h.image_eq_sphere_of_rotational_ode hne _ ε hε hode⟩
 
 end Isoperimetric

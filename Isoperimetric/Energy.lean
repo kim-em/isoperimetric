@@ -1,4 +1,16 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Parametrization
+
+/-!
+# Constant-speed energy
+
+The normalized arclength loop is absolutely continuous, has speed equal to its length almost
+everywhere, and has square-integrable velocity. Its total kinetic energy is the squared length.
+-/
 
 noncomputable section
 
@@ -8,10 +20,12 @@ namespace Isoperimetric
 
 variable {γ : ℝ → Plane}
 
+/-- The Lipschitz arclength loop has integrable velocity. -/
 theorem RectifiableJordan.integrableOn_deriv_arclengthParam (h : RectifiableJordan γ) :
     IntegrableOn (deriv (arclengthParam γ)) (Icc 0 1) :=
   integrableOn_deriv_of_lipschitzOn h.lipschitzOnWith_arclengthParam
 
+/-- The integrated speed of the arclength loop equals the original variation length. -/
 theorem RectifiableJordan.integral_norm_deriv_arclengthParam (h : RectifiableJordan γ) :
     (∫ t in (0 : ℝ)..1, ‖deriv (arclengthParam γ) t‖) = length γ := by
   have hv := eVariationOn_eq_ofReal_integral_norm_deriv (by norm_num : (0 : ℝ) ≤ 1)
@@ -37,11 +51,13 @@ theorem RectifiableJordan.norm_deriv_arclengthParam_ae (h : RectifiableJordan γ
   rw [h.integral_norm_deriv_arclengthParam]
   simp
 
+/-- The arclength velocity is square-integrable. -/
 theorem RectifiableJordan.memLp_deriv_arclengthParam (h : RectifiableJordan γ) :
     MemLp (deriv (arclengthParam γ)) 2 (volume.restrict (Icc (0 : ℝ) 1)) := by
   exact MemLp.of_bound (aestronglyMeasurable_deriv _ _) (length γ)
     (h.norm_deriv_arclengthParam_ae.mono (fun _ ht ↦ ht.le))
 
+/-- The Lipschitz arclength loop is absolutely continuous on the unit interval. -/
 theorem RectifiableJordan.absolutelyContinuousOnInterval_arclengthParam
     (h : RectifiableJordan γ) : AbsolutelyContinuousOnInterval (arclengthParam γ) 0 1 := by
   apply LipschitzOnWith.absolutelyContinuousOnInterval

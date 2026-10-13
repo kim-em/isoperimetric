@@ -1,5 +1,17 @@
-import Isoperimetric.Arclength
-import Isoperimetric.Boundary
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
+import Isoperimetric.BoundaryLength
+import Isoperimetric.BoundaryInequality
+
+/-!
+# Area-length inequality for rectifiable Jordan curves
+
+Apply the two-dimensional geometric boundary inequality to the bounded Jordan interior.
+Its frontier is the trace, whose Hausdorff measure equals the finite variation length.
+-/
 
 noncomputable section
 
@@ -12,7 +24,7 @@ parametrization, with no orientation or smoothness hypothesis. -/
 theorem RectifiableJordan.isoperimetric {γ : ℝ → Plane} (h : RectifiableJordan γ) :
     4 * Real.pi * area γ ≤ length γ ^ 2 := by
   have hi := planar_boundary_inequality (enclosed γ) h.measurableSet_enclosed
-    h.enclosed_properties.2.2
+    h.isBounded_enclosed
   rw [h.frontier_enclosed, h.hausdorffMeasure_trace] at hi
   have hfinite : eVariationOn γ (Icc 0 1) ^ 2 ≠ ⊤ :=
     ENNReal.pow_ne_top h.eVariationOn_ne_top

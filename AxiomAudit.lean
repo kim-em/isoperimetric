@@ -1,9 +1,18 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric
 import Lean.Util.CollectAxioms
 
-open Lean Elab Command
+/-!
+# Axiom audit
 
-/-! Check every local theorem, essential reused bridges, and auxiliary approximation results. -/
+Check every public and private local theorem, essential reused bridges, and final geometric results.
+-/
+
+open Lean Elab Command
 run_cmd do
   let env ← getEnv
   if env.header.moduleNames.contains `Challenge then
@@ -17,11 +26,11 @@ run_cmd do
     `MovingSofa.intervalStieltjes_absoluteContinuity,
     `MovingSofa.intervalStieltjesIntegral_eq_integral_mul_of_density,
     `MovingSofa.curveAreaFunctional_eq_of_comp_monotone_surjective,
-    `MovingSofa.curveArea_eq_jordanInterior_area,
-    `TauCeti.Contour.exists_contDiff_eq_endpoints_dist_lt]
+    `MovingSofa.curveArea_eq_jordanInterior_area]
   let mut checked : Nat := 0
   for (name, info) in env.constants.toList do
-    if (name.getRoot == `Isoperimetric && info.isTheorem) || bridges.contains name then
+    let isLocalTheorem := (privateToUserName name).getRoot == `Isoperimetric && info.isTheorem
+    if isLocalTheorem || bridges.contains name then
       let axioms ← collectAxioms name
       for axiomName in axioms do
         unless allowed.contains axiomName do
@@ -32,7 +41,7 @@ run_cmd do
     unless env.contains bridge do
       throwError "Missing essential bridge {bridge}"
   for finalTheorem in #[`Isoperimetric.classical_isoperimetric,
-      `Isoperimetric.classicalIsoperimetric,
+      `Isoperimetric.classical_isoperimetric_specification,
       `Isoperimetric.RectifiableJordan.classical_isoperimetric,
       `Isoperimetric.RectifiableJordan.circle_of_area_equality,
       `Isoperimetric.RectifiableJordan.equality_of_circle] do

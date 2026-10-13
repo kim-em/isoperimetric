@@ -1,5 +1,19 @@
-import Isoperimetric.Topology.WindingStability
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
+import Isoperimetric.Analysis.Rotation
+import MovingSofa.Curve.Jordan.WindingLifts
 import Mathlib.Topology.Piecewise
+
+/-!
+# Continuous argument across one branch-cut crossing
+
+Correct the principal argument by a full turn at a single downward crossing. The resulting
+continuous lift expresses a winding difference through its endpoint increment. The argument
+uses only continuity, so no smooth approximation is required.
+-/
 
 noncomputable section
 
@@ -94,19 +108,17 @@ theorem curveWinding_sub_eq_relative_arg_increment {a b : ℝ} (hab : a < b)
     let w := planeComplex (x t - p)
     have hz : z ≠ 0 := by
       intro heq
-      have hxq : x t - q = 0 := planeComplex.injective (heq.trans (map_zero _).symm)
+      have hxq : x t - q = 0 := planeComplex.map_eq_zero_iff.mp heq
       exact hq ⟨t, sub_eq_zero.mp hxq⟩
     have hw : w ≠ 0 := by
       intro heq
-      have hxp : x t - p = 0 := planeComplex.injective (heq.trans (map_zero _).symm)
+      have hxp : x t - p = 0 := planeComplex.map_eq_zero_iff.mp heq
       exact hp ⟨t, sub_eq_zero.mp hxp⟩
     have hR : starRingEnd ℂ z * w ≠ 0 := mul_ne_zero (by simpa using hz) hw
-    have hre (v : Plane) : (planeComplex v).re = v 0 := by simp [planeComplex_apply]
-    have him (v : Plane) : (planeComplex v).im = v 1 := by simp [planeComplex_apply]
     have hc : Real.cos (θ t) = z.re / ‖z‖ := by
-      simpa only [z, hre, planeComplex.norm_map] using (hθ.2 t).1
+      simpa only [z, planeComplex_re, planeComplex.norm_map] using (hθ.2 t).1
     have hs : Real.sin (θ t) = z.im / ‖z‖ := by
-      simpa only [z, him, planeComplex.norm_map] using (hθ.2 t).2
+      simpa only [z, planeComplex_im, planeComplex.norm_map] using (hθ.2 t).2
     have hrot := MovingSofa.normalized_complex_rotation_by_relative_arg hz hw hc hs
     have hcos : Real.cos (ψ t) = Real.cos (arg (starRingEnd ℂ z * w)) := by
       rw [cos_arg hR]
@@ -119,7 +131,7 @@ theorem curveWinding_sub_eq_relative_arg_increment {a b : ℝ} (hab : a < b)
     have hsinadd : Real.sin (θ t + ψ t) = Real.sin (θ t + arg (starRingEnd ℂ z * w)) := by
       rw [Real.sin_add, Real.sin_add, hcos, hsin]
     rw [hcosadd, hsinadd]
-    simpa only [w, hre, him, planeComplex.norm_map] using hrot
+    simpa only [w, planeComplex_re, planeComplex_im, planeComplex.norm_map] using hrot
   rw [hlift.curveWinding_eq hab.le, hθ.curveWinding_eq hab.le]
   ring
 
@@ -151,10 +163,10 @@ theorem curveWinding_sub_eq_one_of_single_relative_crossing {a b : ℝ} (hab : a
     apply mul_ne_zero
     · apply (map_ne_zero (starRingEnd ℂ)).mpr
       intro heq
-      have hzero : x t - q = 0 := planeComplex.injective (heq.trans (map_zero _).symm)
+      have hzero : x t - q = 0 := planeComplex.map_eq_zero_iff.mp heq
       exact hq ⟨t, sub_eq_zero.mp hzero⟩
     · intro heq
-      have hzero : x t - p = 0 := planeComplex.injective (heq.trans (map_zero _).symm)
+      have hzero : x t - p = 0 := planeComplex.map_eq_zero_iff.mp heq
       exact hp ⟨t, sub_eq_zero.mp hzero⟩
   obtain ⟨ψ, hψ, hdir, hinc⟩ := exists_arg_lift_increment_two_pi_of_single_crossing
     hcont c hc hRc hne hcRe hcIm haway hside

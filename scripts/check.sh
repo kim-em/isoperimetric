@@ -2,8 +2,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 lake build
-lake env lean AxiomAudit.lean
-lake env lean StatementCheck.lean
+lake env lean -DwarningAsError=true -Dlinter.mathlibStandardSet=true AxiomAudit.lean
+lake env lean -DwarningAsError=true -Dlinter.mathlibStandardSet=true StatementCheck.lean
 # These checks apply to local mathematical sources, not unused benchmark templates.
 # grep is present on the CI runner. Only exit 1 means a successful scan with no matches;
 # a missing command or unreadable input must fail verification.

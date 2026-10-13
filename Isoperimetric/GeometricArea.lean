@@ -1,6 +1,18 @@
-import Isoperimetric.Analysis.CircularImage
-import Isoperimetric.Circle
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
+import Isoperimetric.Rigidity
 import MovingSofa.Curve.Jordan.SignedArea
+
+/-!
+# From signed boundary area to enclosed Lebesgue area
+
+Apply MovingSofa's Jordan area theorem to an oriented BV parametrization, handling reversal
+explicitly. Transport the signed area through arclength normalization and obtain circle
+rigidity from equality in the geometric area-length formula.
+-/
 
 noncomputable section
 
@@ -10,6 +22,7 @@ namespace Isoperimetric
 
 variable {γ : ℝ → Plane}
 
+/-- The range of the interval-subtype BV path equals the geometric trace. -/
 theorem RectifiableJordan.range_bvPath (h : RectifiableJordan γ) :
     range h.bvPath.val = trace γ := by
   ext p
@@ -77,17 +90,6 @@ theorem RectifiableJordan.signedArea_eq_neg_area_of_clockwise (h : RectifiableJo
   have hyarea : MovingSofa.curveAreaFunctional y = area γ :=
     MovingSofa.curveArea_eq_jordanInterior_area 0 1 (by norm_num) (trace γ) y hyori
   linarith
-
-/-- Once the genuine winding orientation is known, the unsigned signed area is
-the actual enclosed Lebesgue area, for either orientation. -/
-theorem RectifiableJordan.abs_signedArea_eq_area_of_orientation (h : RectifiableJordan γ)
-    (b : Bool)
-    (hori : MovingSofa.IsOrientedJordanParametrization (by norm_num : (0 : ℝ) ≤ 1)
-      (trace γ) b h.bvPath.val) : |MovingSofa.curveAreaFunctional h.bvPath| = area γ := by
-  have hA : 0 ≤ area γ := ENNReal.toReal_nonneg
-  cases b
-  · rw [h.signedArea_eq_neg_area_of_clockwise hori, abs_neg, abs_of_nonneg hA]
-  · rw [h.signedArea_eq_area_of_counterclockwise hori, abs_of_nonneg hA]
 
 /-- The geometric equality-to-circle implication with the winding orientation
 explicit. The unrestricted theorem in `Main.lean` derives this input geometrically. -/

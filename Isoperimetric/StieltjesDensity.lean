@@ -1,4 +1,17 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import MovingSofa.Analysis.Stieltjes.AbsoluteContinuity
+
+/-!
+# Stieltjes density for absolutely continuous coordinates
+
+Identify the interval Stieltjes measure with the almost-everywhere derivative density.
+This bridge supports singular original parametrizations by applying only after arclength
+normalization.
+-/
 
 noncomputable section
 

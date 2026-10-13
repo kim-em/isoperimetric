@@ -1,5 +1,18 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Analysis.Rotation
 import Isoperimetric.Energy
+
+/-!
+# A regular point and an isolated normal crossing
+
+Almost-everywhere constant positive speed supplies an interior parameter with nonzero
+velocity. Differentiability there and simplicity isolate a short normal segment that meets
+the loop exactly once.
+-/
 
 noncomputable section
 
@@ -14,7 +27,8 @@ variable {γ : ℝ → Plane}
 theorem RectifiableJordan.exists_regular_parameter (h : RectifiableJordan γ) :
     ∃ t ∈ Ioo (0 : ℝ) 1, ∃ v : Plane,
       HasDerivAt (arclengthParam γ) v t ∧ ‖v‖ = length γ := by
-  have hd := h.lipschitzOnWith_arclengthParam.ae_differentiableWithinAt (μ := volume) measurableSet_Icc
+  have hd := h.lipschitzOnWith_arclengthParam.ae_differentiableWithinAt (μ := volume)
+    measurableSet_Icc
   have hn := h.norm_deriv_arclengthParam_ae
   rw [← restrict_Ioo_eq_restrict_Icc] at hd hn
   have ha : ∀ᵐ t ∂volume.restrict (Ioo (0 : ℝ) 1),
@@ -32,7 +46,7 @@ theorem positive_secant_near_regular_parameter {η : ℝ → Plane} {t : ℝ} {v
     ∃ δ > 0, ∀ s : ℝ, |s - t| < δ → s ≠ t →
       0 < (planeComplex (η s - η t) / planeComplex v).re / (s - t) := by
   let z : ℝ → ℂ := fun s ↦ planeComplex (η s - η t) / planeComplex v
-  have hvC : planeComplex v ≠ 0 := fun hz ↦ hv (planeComplex.injective (hz.trans (map_zero _).symm))
+  have hvC : planeComplex v ≠ 0 := fun hz ↦ hv (planeComplex.map_eq_zero_iff.mp hz)
   have hzD : HasDerivAt z 1 t := by
     have hD := (planeComplex.toContinuousLinearMap.hasFDerivAt.comp_hasDerivAt t
       (hd.sub_const (η t))).div_const (planeComplex v)
@@ -84,7 +98,10 @@ theorem RectifiableJordan.exists_spatial_neighborhood_of_parameter_window (h : R
 /-- A short normal segment through a regular arclength point meets the loop only there. -/
 theorem RectifiableJordan.exists_normal_crosscut (h : RectifiableJordan γ) :
     ∃ t ∈ Ioo (0 : ℝ) 1, ∃ v : Plane, v ≠ 0 ∧
-      HasDerivAt (arclengthParam γ) v t ∧ ∃ α > 0,
+      HasDerivAt (arclengthParam γ) v t ∧
+      (∃ δ > 0, ∀ s : ℝ, |s - t| < δ → s ≠ t →
+        0 < (planeComplex (arclengthParam γ s - arclengthParam γ t) /
+          planeComplex v).re / (s - t)) ∧ ∃ α > 0,
       ∀ s ∈ Icc (0 : ℝ) 1, ∀ u : ℝ, |u| < α →
         arclengthParam γ s = arclengthParam γ t + u • quarterTurn v → s = t ∧ u = 0 := by
   obtain ⟨t, ht, v, hd, hn⟩ := h.exists_regular_parameter
@@ -96,14 +113,14 @@ theorem RectifiableJordan.exists_normal_crosscut (h : RectifiableJordan γ) :
   obtain ⟨δ, hδ, hsec⟩ := positive_secant_near_regular_parameter hd hv
   obtain ⟨ρ, hρ, hnear⟩ := h.exists_spatial_neighborhood_of_parameter_window ht hδ
   have hnpos : 0 < ‖v‖ := norm_pos_iff.mpr hv
-  refine ⟨t, ht, v, hv, hd, ρ / ‖v‖, div_pos hρ hnpos, ?_⟩
+  refine ⟨t, ht, v, hv, hd, ⟨δ, hδ, hsec⟩, ρ / ‖v‖, div_pos hρ hnpos, ?_⟩
   intro s hs u hu heq
   have hdiff : arclengthParam γ s - arclengthParam γ t = u • quarterTurn v := by
     rw [heq, add_sub_cancel_left]
   have hclose : ‖arclengthParam γ s - arclengthParam γ t‖ < ρ := by
     rw [hdiff, norm_smul, Real.norm_eq_abs, norm_quarterTurn]
     exact (lt_div_iff₀ hnpos).mp hu
-  have hvC : planeComplex v ≠ 0 := fun hz ↦ hv (planeComplex.injective (hz.trans (map_zero _).symm))
+  have hvC : planeComplex v ≠ 0 := fun hz ↦ hv (planeComplex.map_eq_zero_iff.mp hz)
   have hproject : (planeComplex (arclengthParam γ s - arclengthParam γ t) /
       planeComplex v).re = 0 := by
     rw [hdiff, map_smul, planeComplex_quarterTurn, Complex.real_smul]

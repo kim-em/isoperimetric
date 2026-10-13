@@ -1,8 +1,21 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Parametrization
 import Isoperimetric.Energy
 import Isoperimetric.StieltjesDensity
 import MovingSofa.Curve.AreaTransport
 import MovingSofa.Analysis.Stieltjes.DensityIntegration
+
+/-!
+# Stieltjes area under arclength normalization
+
+Represent a rectifiable Jordan loop as a continuous coordinatewise BV path. Transport its
+signed Stieltjes area along the normalized length coordinate, and identify the area of the
+absolutely continuous arclength loop with the integral of its planar determinant.
+-/
 
 noncomputable section
 
@@ -21,36 +34,20 @@ def RectifiableJordan.bvPath (h : RectifiableJordan γ) : MovingSofa.ContinuousB
   intro i
   exact (EuclideanSpace.proj (𝕜 := ℝ) i).lipschitzWith.comp_boundedVariationOn hb
 
-theorem RectifiableJordan.monotoneOn_normalizedLength (h : RectifiableJordan γ) :
-    MonotoneOn (normalizedLength γ) (Icc 0 1) := by
-  intro s hs t ht hst
-  exact div_le_div_of_nonneg_right
-    (variationOnFromTo.monotoneOn h.boundedVariationOn.locallyBoundedVariationOn
-      (by norm_num) hs ht hst) h.length_pos.le
-
 /-- Arclength reparametrization also preserves the signed Stieltjes area.
 This is a separate bridge; Lebesgue area remains the geometric `area` definition. -/
 theorem RectifiableJordan.signedArea_arclengthParam (h : RectifiableJordan γ) :
     MovingSofa.curveAreaFunctional h.arclengthParam_isRectifiableJordan.bvPath =
       MovingSofa.curveAreaFunctional h.bvPath := by
-  let φ : Icc (0 : ℝ) 1 → Icc (0 : ℝ) 1 := fun t ↦
-    ⟨normalizedLength γ t, h.normalizedLength_image.subset (mem_image_of_mem _ t.property)⟩
-  have hc : Continuous φ := by
-    apply Continuous.subtype_mk
-    exact continuousOn_iff_continuous_domRestrict.mp
-      (h.continuousOn_accumulatedLength.div_const _)
-  have hm : Monotone φ := fun s t hst ↦
-    h.monotoneOn_normalizedLength s.property t.property hst
-  have hs : Function.Surjective φ := by
-    intro t
-    obtain ⟨s, hs, hst⟩ := h.normalizedLength_image.symm.subset t.property
-    exact ⟨⟨s, hs⟩, Subtype.ext hst⟩
   symm
   apply MovingSofa.curveAreaFunctional_eq_of_comp_monotone_surjective
-    (by norm_num) (by norm_num) h.arclengthParam_isRectifiableJordan.bvPath h.bvPath φ hc hm hs
+    (by norm_num) (by norm_num) h.arclengthParam_isRectifiableJordan.bvPath h.bvPath
+    h.normalizedLengthMap h.continuous_normalizedLengthMap h.monotone_normalizedLengthMap
+    h.surjective_normalizedLengthMap
   funext t
   exact (h.arclengthParam_normalizedLength t.property).symm
 
+/-- Each arclength coordinate has Stieltjes density equal to its almost-everywhere velocity. -/
 theorem RectifiableJordan.stieltjes_coordinate_arclengthParam (h : RectifiableJordan γ)
     (i j : Fin 2) :
     MovingSofa.intervalStieltjesIntegral

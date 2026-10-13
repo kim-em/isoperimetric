@@ -1,5 +1,17 @@
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Statement
 import Mathlib.Analysis.Complex.Basic
+
+/-!
+# Planar rotation and complex coordinates
+
+Coordinate formulas for the Euclidean norm, determinant and quarter turn, together with the
+real linear isometry to the complex plane. These identities support both rigidity and winding.
+-/
 
 noncomputable section
 
@@ -25,9 +37,12 @@ private def quarterTurnLinear : Plane →ₗ[ℝ] Plane where
 /-- Counterclockwise rotation through ninety degrees. -/
 def quarterTurn : Plane →L[ℝ] Plane := quarterTurnLinear.toContinuousLinearMap
 
+/-- The horizontal coordinate of a counterclockwise quarter turn. -/
 @[simp] theorem quarterTurn_zero (z : Plane) : quarterTurn z 0 = -z 1 := rfl
+/-- The vertical coordinate of a counterclockwise quarter turn. -/
 @[simp] theorem quarterTurn_one (z : Plane) : quarterTurn z 1 = z 0 := rfl
 
+/-- A quarter turn preserves Euclidean norm. -/
 theorem norm_quarterTurn (z : Plane) : ‖quarterTurn z‖ = ‖z‖ := by
   apply (sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)).mp
   simp only [plane_norm_sq, quarterTurn_zero, quarterTurn_one, neg_sq]
@@ -41,6 +56,7 @@ theorem norm_sub_quarterTurn_sq (z v : Plane) (ω : ℝ) :
     quarterTurn_zero, quarterTurn_one, smul_eq_mul, determinant]
   ring
 
+/-- Translating the first determinant argument subtracts the determinant of the translation. -/
 theorem determinant_sub_left (z c v : Plane) :
     determinant (z - c) v = determinant z v - determinant c v := by
   simp only [determinant, PiLp.sub_apply]
@@ -49,10 +65,20 @@ theorem determinant_sub_left (z c v : Plane) :
 /-- The standard real linear isometry from the plane to the complex numbers. -/
 def planeComplex : Plane ≃ₗᵢ[ℝ] ℂ := Complex.orthonormalBasisOneI.repr.symm
 
+/-- The coordinate formula for the real linear plane-to-complex isometry. -/
 @[simp] theorem planeComplex_apply (z : Plane) :
     planeComplex z = (z 0 : ℂ) + (z 1 : ℂ) * Complex.I :=
   Complex.orthonormalBasisOneI_repr_symm_apply z
 
+/-- The real coordinate of the plane-to-complex isometry. -/
+@[simp] theorem planeComplex_re (v : Plane) : (planeComplex v).re = v 0 := by
+  simp [planeComplex_apply]
+
+/-- The imaginary coordinate of the plane-to-complex isometry. -/
+@[simp] theorem planeComplex_im (v : Plane) : (planeComplex v).im = v 1 := by
+  simp [planeComplex_apply]
+
+/-- Quarter turns correspond to multiplication by the imaginary unit. -/
 theorem planeComplex_quarterTurn (z : Plane) :
     planeComplex (quarterTurn z) = Complex.I * planeComplex z := by
   apply Complex.ext <;> simp [planeComplex_apply]

@@ -1,26 +1,14 @@
-import Isoperimetric.Statement
-import Isoperimetric.Jordan
-import Isoperimetric.Boundary
-import Isoperimetric.Arclength
-import Isoperimetric.Inequality
-import Isoperimetric.Parametrization
-import Isoperimetric.Energy
-import Isoperimetric.SignedArea
-import Isoperimetric.StieltjesDensity
-import Isoperimetric.Analysis.Wirtinger
-import Isoperimetric.Analysis.Planar
-import Isoperimetric.Analysis.Rotation
-import Isoperimetric.Analysis.Area
-import Isoperimetric.Analysis.CompletionSquare
-import Isoperimetric.Analysis.RotationalODE
-import Isoperimetric.Analysis.CircularImage
-import Isoperimetric.CircleInterior
-import Isoperimetric.Circle
-import Isoperimetric.GeometricArea
-import Isoperimetric.Topology.RegularPoint
-import Isoperimetric.Topology.SmoothApproximation
-import Isoperimetric.Topology.WindingStability
-import Isoperimetric.Topology.ArgumentJump
-import Isoperimetric.Topology.NormalWindingJump
-import Isoperimetric.Topology.Orientation
+/-
+Copyright (c) 2026 Kim Morrison. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kim Morrison
+-/
 import Isoperimetric.Main
+
+/-!
+# Classical planar isoperimetry
+
+Import this module for the area-length inequality and its circle equality characterization.
+The main theorem accepts only continuity, closedness, simplicity and rectifiability.
+
+-/
