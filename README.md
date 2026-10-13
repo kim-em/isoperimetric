@@ -91,6 +91,16 @@ The target equality characterization, recorded as the unproved proposition
   winds uniformly `1` or uniformly `-1` around its bounded Jordan component.
   The final unrestricted equality theorem and catalogue entry await that proof.
 
+- [Topology/RegularPoint.lean](Isoperimetric/Topology/RegularPoint.lean) finds a
+  nonzero derivative at an interior arclength parameter and constructs a short
+  normal segment meeting the trace only at that point.
+  [SmoothApproximation.lean](Isoperimetric/Topology/SmoothApproximation.lean)
+  reuses TauCeti's endpoint-preserving Bernstein approximation for continuous
+  complex paths. [WindingStability.lean](Isoperimetric/Topology/WindingStability.lean)
+  proves that sufficiently small uniform perturbations preserve the topological
+  winding of a continuous closed loop. These are inputs to the remaining
+  orientation proof; they do not yet establish it.
+
 ## Reproducible build
 
 Install Elan, then run:
@@ -115,6 +125,7 @@ rejects importing `Challenge`. CI runs the build and audit.
 | Mathlib | `c32e1ec0d1eb5237ba344eee50162f45d5b0fc76` |
 | [Humanfia Lean Eval archive](https://huggingface.co/datasets/humanfia-lab/lean-eval-source/tree/6a6d9f67a91d546677321aeea559c2857b697635/problems/isoperimetric_inequality) | `6a6d9f67a91d546677321aeea559c2857b697635` |
 | [MovingSofa](https://github.com/deancureton/MovingSofa/tree/4d5569131940815f47a9ccf3e90a4c5043c56127) | `4d5569131940815f47a9ccf3e90a4c5043c56127` |
+| [TauCeti](https://github.com/TauCetiProject/TauCeti/tree/aa1f50f094b85057c11f0bb07177ff27a32dbd7f) | `aa1f50f094b85057c11f0bb07177ff27a32dbd7f` |
 
 All transitive dependency revisions are recorded in `lake-manifest.json`.
 Humanfia is consumed as a Git dependency with the Lake package subdirectory
@@ -134,13 +145,18 @@ The analytic module contains attributed adaptations of Mathlib's Fourier
 coefficient algebra and TauCeti's Parseval argument at revision
 `8014353f314435299acce5b6faa19d781530cfa2`, strengthening the real scalar theorem
 to absolute continuity. The upstream sharp Wirtinger and symplectic loop bound
-still require derivatives everywhere. MovingSofa already
-declares a vendored `TauCeti` library, so a second overlapping Lake dependency is
-not added.
-The newer TauCeti revision `aa1f50f094b85057c11f0bb07177ff27a32dbd7f` was also
-checked for the remaining winding bridge. Its straight-segment winding jump
-theorem still requires a piecewise `C¹` curve; it does not directly supply the
-unit-winding result for an arbitrary Lipschitz Jordan loop.
+still require derivatives everywhere.
+
+TauCeti is also consumed directly as a pinned Git dependency for its smooth
+approximation theorem. [The MovingSofa configuration patch](patches/movingsofa-upstream-tauceti.patch)
+removes the vendored `TauCeti` library declaration, making the upstream package
+its sole module provider. It changes no mathematical source. The preparation
+script verifies MovingSofa's pin and applies this patch before Lake loads the
+package configuration. The required modules compile against the root Lean and
+Mathlib pins without a TauCeti source patch, despite TauCeti's own newer toolchain.
+Only imported modules are built. Its straight-segment winding jump theorem was
+also compiled successfully in this environment, but its piecewise `C¹`
+hypothesis still needs a proved bridge to the original Lipschitz loop.
 
 ## Comparison with the HOL Light theorem
 

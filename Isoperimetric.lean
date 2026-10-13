@@ -17,3 +17,6 @@ import Isoperimetric.Analysis.CircularImage
 import Isoperimetric.CircleInterior
 import Isoperimetric.Circle
 import Isoperimetric.GeometricArea
+import Isoperimetric.Topology.RegularPoint
+import Isoperimetric.Topology.SmoothApproximation
+import Isoperimetric.Topology.WindingStability

@@ -11,6 +11,11 @@ git = "https://github.com/leanprover-community/mathlib4.git"
 rev = "c32e1ec0d1eb5237ba344eee50162f45d5b0fc76"
 
 [[require]]
+name = "TauCeti"
+git = "https://github.com/TauCetiProject/TauCeti.git"
+rev = "aa1f50f094b85057c11f0bb07177ff27a32dbd7f"
+
+[[require]]
 name = "MovingSofa"
 git = "https://github.com/deancureton/MovingSofa.git"
 rev = "4d5569131940815f47a9ccf3e90a4c5043c56127"
