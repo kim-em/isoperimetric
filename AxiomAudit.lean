@@ -31,6 +31,11 @@ run_cmd do
   for bridge in bridges do
     unless env.contains bridge do
       throwError "Missing essential bridge {bridge}"
-  unless env.contains `Isoperimetric.RectifiableJordan.isoperimetric do
-    throwError "Missing public geometric inequality"
+  for finalTheorem in #[`Isoperimetric.classical_isoperimetric,
+      `Isoperimetric.classicalIsoperimetric,
+      `Isoperimetric.RectifiableJordan.classical_isoperimetric,
+      `Isoperimetric.RectifiableJordan.circle_of_area_equality,
+      `Isoperimetric.RectifiableJordan.equality_of_circle] do
+    unless env.contains finalTheorem do
+      throwError "Missing final geometric theorem {finalTheorem}"
   logInfo m!"Axiom audit passed for {checked} declarations"

@@ -34,7 +34,7 @@ def length (γ : ℝ → Plane) : ℝ := (eVariationOn γ (Icc 0 1)).toReal
 /-- Actual Lebesgue area; its finiteness must be proved before using `toReal`. -/
 def area (γ : ℝ → Plane) : ℝ := (volume (enclosed γ)).toReal
 
-/-- The target proposition, recorded separately from its eventual proof. -/
+/-- The geometric target proposition, proved by `classicalIsoperimetric` in `Main.lean`. -/
 def ClassicalIsoperimetric : Prop :=
   ∀ (γ : ℝ → Plane), RectifiableJordan γ →
     4 * Real.pi * area γ ≤ length γ ^ 2 ∧

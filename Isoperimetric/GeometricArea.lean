@@ -90,7 +90,7 @@ theorem RectifiableJordan.abs_signedArea_eq_area_of_orientation (h : Rectifiable
   · rw [h.signedArea_eq_area_of_counterclockwise hori, abs_of_nonneg hA]
 
 /-- The geometric equality-to-circle implication with the winding orientation
-explicit. Removing this additional orientation input is the remaining topological bridge. -/
+explicit. The unrestricted theorem in `Main.lean` derives this input geometrically. -/
 theorem RectifiableJordan.circle_of_area_equality_of_orientation (h : RectifiableJordan γ)
     (b : Bool)
     (hori : MovingSofa.IsOrientedJordanParametrization (by norm_num : (0 : ℝ) ≤ 1)

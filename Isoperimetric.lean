@@ -20,3 +20,7 @@ import Isoperimetric.GeometricArea
 import Isoperimetric.Topology.RegularPoint
 import Isoperimetric.Topology.SmoothApproximation
 import Isoperimetric.Topology.WindingStability
+import Isoperimetric.Topology.ArgumentJump
+import Isoperimetric.Topology.NormalWindingJump
+import Isoperimetric.Topology.Orientation
+import Isoperimetric.Main
