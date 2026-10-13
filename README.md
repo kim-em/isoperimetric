@@ -34,8 +34,10 @@ is retained unchanged in [GOAL.txt](GOAL.txt).
 
 - The interval loop descends to a Jordan curve on the circle. MovingSofa's
   Jordan separation gives its interior and frontier. Splitting into two
-  injective arcs identifies Hausdorff boundary length with total variation;
-  raw and normalized Hausdorff measure are reconciled explicitly.
+  injective arcs in [BoundaryLength.lean](Isoperimetric/BoundaryLength.lean)
+  identifies Hausdorff boundary length with total variation.
+  [BoundaryInequality.lean](Isoperimetric/BoundaryInequality.lean) reconciles raw
+  and normalized Hausdorff measure explicitly.
 - [Inequality.lean](Isoperimetric/Inequality.lean) specializes Humanfia's complete
   geometric isoperimetric inequality to the Jordan interior in dimension two.
 - [Parametrization.lean](Isoperimetric/Parametrization.lean) and
@@ -48,16 +50,16 @@ is retained unchanged in [GOAL.txt](GOAL.txt).
   point a short normal segment meets the curve once. A continuous argument
   calculation proves a unit winding jump across it. Jordan separation, local
   constancy, and vanishing in the unbounded component give interior winding
-  uniformly `1` or `-1`. MovingSofa's area theorem then identifies the signed
-  boundary functional with actual Lebesgue area, handling reversal explicitly.
+  uniformly `1` or `-1`. [GeometricArea.lean](Isoperimetric/GeometricArea.lean)
+  then applies MovingSofa's area theorem to identify the signed boundary functional
+  with actual Lebesgue area, handling reversal explicitly.
 - [Analysis/Wirtinger.lean](Isoperimetric/Analysis/Wirtinger.lean) extends Fourier
   integration by parts and sharp Wirtinger to absolute continuity with an `L²`
   derivative. [Analysis/Loop.lean](Isoperimetric/Analysis/Loop.lean) and the rest of
   the analytic layer work for any closed absolutely continuous loop with L² velocity,
   independently of Jordan geometry. [Rigidity.lean](Isoperimetric/Rigidity.lean)
   applies these results to the arclength loop. The planar estimate and completion
-  of squares force the rotational
-  ODE almost everywhere at equality. Absolute continuity solves this ODE with
+  of squares force the rotational ODE almost everywhere at equality. Absolute continuity solves this ODE with
   an integrating factor; its image is a positive-radius circle.
 - [Circle.lean](Isoperimetric/Circle.lean) and
   [CircleInterior.lean](Isoperimetric/CircleInterior.lean) prove circle length
