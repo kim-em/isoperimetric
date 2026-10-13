@@ -13,7 +13,10 @@ run_cmd do
     `Submission.isoperimetric,
     `MeasureTheory.hausdorffMeasure_image_Icc_eq_eVariationOn,
     `MovingSofa.jordan_separation,
-    `MovingSofa.IsJordanCurve.frontier_jordanInterior]
+    `MovingSofa.IsJordanCurve.frontier_jordanInterior,
+    `MovingSofa.intervalStieltjes_absoluteContinuity,
+    `MovingSofa.intervalStieltjesIntegral_eq_integral_mul_of_density,
+    `MovingSofa.curveAreaFunctional_eq_of_comp_monotone_surjective]
   let mut checked : Nat := 0
   for (name, info) in env.constants.toList do
     if (name.getRoot == `Isoperimetric && info.isTheorem) || bridges.contains name then

@@ -57,6 +57,12 @@ The target equality characterization, recorded as the unproved proposition
   absolutely continuous, its derivative has norm equal to the geometric length
   almost everywhere and belongs to `L²`, and its loop energy is the squared
   geometric length.
+- [SignedArea.lean](Isoperimetric/SignedArea.lean) proves that arclength
+  reparametrization preserves MovingSofa's signed Stieltjes area and identifies
+  that functional with the usual coordinate boundary integral.
+  [StieltjesDensity.lean](Isoperimetric/StieltjesDensity.lean) supplies the
+  derivative density for absolutely continuous coordinates without assuming
+  everywhere differentiability.
 - The remaining work is the analytic area bridge, orientation for an arbitrary
   Jordan loop, sharp Wirtinger at this regularity, almost-everywhere circular ODE
   rigidity, and the positive-radius circle converse. The final combined theorem

@@ -5,3 +5,5 @@ import Isoperimetric.Arclength
 import Isoperimetric.Inequality
 import Isoperimetric.Parametrization
 import Isoperimetric.Energy
+import Isoperimetric.SignedArea
+import Isoperimetric.StieltjesDensity
