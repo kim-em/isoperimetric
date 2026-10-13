@@ -1,0 +1,44 @@
+Subject: Lean 4 formalization of theorem 43 — the classical isoperimetric theorem
+
+Dear Freek,
+
+A Lean 4 formalization of the full classical planar isoperimetric theorem is
+available at https://github.com/kim-em/isoperimetric.
+
+For every continuous rectifiable simple closed planar curve, with geometric
+length L and actual Lebesgue area A of its bounded Jordan interior, it proves
+
+    4 * pi * A <= L^2,
+
+with equality if and only if the curve's image is a positive-radius circle.
+The theorem covers nonconvex curves, either orientation, and arbitrary
+continuous rectifiable parametrizations. It requires no smoothness or assumed
+area/Fourier identities. This matches the rectifiable simple closed curve scope
+of the HOL Light result listed for entry 43 and also proves the circle converse.
+
+Authorship: Kim Morrison, with Codex assistance; building on Mathlib, Humanfia's
+Lean Eval archive, MovingSofa, and the Tau Ceti contributors. Exact source pins,
+credits, compatibility patches, and build instructions are recorded in README.md.
+
+Permanent source links:
+
+Public theorem, Isoperimetric.classical_isoperimetric (four geometric hypotheses):
+https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Main.lean#L37
+
+Geometric hypotheses and definitions of trace, length, and Jordan-interior area:
+https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Statement.lean#L18
+
+Complete target proposition and its proof:
+https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Statement.lean#L38
+https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/Isoperimetric/Main.lean#L46
+
+Proof architecture, credits, and reproducible build:
+https://github.com/kim-em/isoperimetric/blob/c3fb04c5c8538eed860d1016a220ed9d91dc97e4/README.md
+
+The final theorem and all local mathematical theorems have been kernel checked
+and axiom audited. Their only axioms are propext, Classical.choice, and Quot.sound.
+The default build includes all mathematical modules; CI enforces compilation,
+the axiom audit, and exclusion of proof placeholders and kernel bypasses.
+
+Best,
+Kim

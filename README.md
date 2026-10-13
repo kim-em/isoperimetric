@@ -113,7 +113,7 @@ This proves the full rectifiable simple closed curve scope of
 [Freek Wiedijk's HOL Light entry 43](https://www.cs.ru.nl/~freek/100/hol.html#43)
 and [HOL Light's `ISOPERIMETRIC_THEOREM`](https://github.com/jrh13/hol-light/blob/master/100/isoperimetric.ml),
 and also proves the circle converse and positivity of its radius.
-A ready-to-send catalogue entry is provided in `CATALOGUE.txt`.
+A ready-to-send catalogue entry is provided in [CATALOGUE.txt](CATALOGUE.txt).
 
 The requested macOS path `/Users/kim/projects/lean/isoperimetric` is not writable
 on this Linux host. The working repository is `/home/kim/isoperimetric`; the build
